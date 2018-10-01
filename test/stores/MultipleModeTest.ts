@@ -437,11 +437,8 @@ describe('Multiple Mode', () => {
   });
 
   describe('onChange when customValues=false', () => {
-    it('only triggers onChange when a valid value is committed', () => {
-
-    });
+    it('only triggers onChange when a valid value is committed', () => {});
   });
-
 
   describe('setEntries()', () => {
     it('does not lose focus of active entry', () => {

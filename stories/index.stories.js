@@ -27,75 +27,75 @@ const notStartWithNumber = (v, s) => !/^\d/.test(s.input);
 
 storiesOf('Single Value', module)
   .addDecorator(Container)
-  .add('States', () => <StateLookup/>)
+  .add('States', () => <StateLookup />)
   .add('State - Using Labels', () => {
     return (
       <div>
         <p>This example uses custom labels for the values after they have been selected.</p>
         <div>
-          <StateLookup labels/>
+          <StateLookup labels />
         </div>
       </div>
     );
   })
-  .add('Custom Values', () => <StateLookup customValues/>)
-  .add('Rewriting Values', () => <StateLookup customValues rewriteValue/>)
-  .add('Custom MenuItem', () => <StateLookup customMenuItem/>)
-  .add('Custom Dropdown', () => <StateLookup customDropdown/>)
+  .add('Custom Values', () => <StateLookup customValues />)
+  .add('Rewriting Values', () => <StateLookup customValues rewriteValue />)
+  .add('Custom MenuItem', () => <StateLookup customMenuItem />)
+  .add('Custom Dropdown', () => <StateLookup customDropdown />)
   .add('customValues()', () => (
     <div>
       <p>This example allows custom values as long as the value does NOT start with a number</p>
-      <StateLookup customValues={notStartWithNumber}/>
+      <StateLookup customValues={notStartWithNumber} />
     </div>
   ))
   .add('Auto Positioning', () => (
     <div style={{paddingTop: 700, paddingBottom: 700}}>
-      <StateLookup/>
+      <StateLookup />
     </div>
   ));
 
 storiesOf('Multiple Value', module)
   .addDecorator(Container)
-  .add('States', () => <StateLookup type="multiple"/>)
-  .add('States - No Duplicates', () => <StateLookup noDupes type="multiple"/>)
-  .add('Custom Values', () => <StateLookup customValues type="multiple"/>)
-  .add('Rewriting Values', () => <StateLookup customValues rewriteValue type="multiple"/>)
+  .add('States', () => <StateLookup type="multiple" />)
+  .add('States - No Duplicates', () => <StateLookup noDupes type="multiple" />)
+  .add('Custom Values', () => <StateLookup customValues type="multiple" />)
+  .add('Rewriting Values', () => <StateLookup customValues rewriteValue type="multiple" />)
   .add('customValues()', () => (
     <div>
       <p>This example allows custom values as long as the value does NOT start with a number</p>
-      <StateLookup type="multiple" customValues={notStartWithNumber}/>
+      <StateLookup type="multiple" customValues={notStartWithNumber} />
     </div>
   ));
 
 storiesOf('Faceted Values', module)
   .addDecorator(Container)
-  .add('Countries/States', () => <FacetedLookup/>)
-  .add('Countries/States - Custom Values', () => <FacetedLookup customValues/>)
+  .add('Countries/States', () => <FacetedLookup />)
+  .add('Countries/States - Custom Values', () => <FacetedLookup customValues />)
   .add('Countries/States - Custom Values as Function', () => (
     <div>
       <div>In this example, custom values are allowed, but only for state facets.</div>
-      <FacetedLookup customValues={isState}/>
+      <FacetedLookup customValues={isState} />
     </div>
   ))
-  .add('Countries/States - Rewriting Values', () => <FacetedLookup customValues rewriteValue/>)
-  .add('Standalone Values', () => <FacetedLookup standalone/>)
-  .add('Custom Dropdown for State', () => <FacetedLookup standalone customDropdown/>);
+  .add('Countries/States - Rewriting Values', () => <FacetedLookup customValues rewriteValue />)
+  .add('Standalone Values', () => <FacetedLookup standalone />)
+  .add('Custom Dropdown for State', () => <FacetedLookup standalone customDropdown />);
 
 storiesOf('<SingleValue>', module)
   .addDecorator(Container)
-  .add('Basic', () => <SingleValueExample/>);
+  .add('Basic', () => <SingleValueExample />);
 
 storiesOf('<MultiValue>', module)
   .addDecorator(Container)
-  .add('Basic', () => <MultiValueExample/>)
-  .add('Partial Auto Complete', () => <MultiValuePartial/>);
+  .add('Basic', () => <MultiValueExample />)
+  .add('Partial Auto Complete', () => <MultiValuePartial />);
 
 storiesOf('<FacetedValue>', module)
   .addDecorator(Container)
-  .add('Basic', () => <FacetedValueExample/>)
-  .add('Partials', () => <FacetedPartial/>)
-  .add('Country/State/HashTag', () => <FacetedValueWithHashtag/>);
+  .add('Basic', () => <FacetedValueExample />)
+  .add('Partials', () => <FacetedPartial />)
+  .add('Country/State/HashTag', () => <FacetedValueWithHashtag />);
 
 storiesOf('other', module)
   .addDecorator(Container)
-  .add('File Path', () => <FilenameLookup/>);
+  .add('File Path', () => <FilenameLookup />);

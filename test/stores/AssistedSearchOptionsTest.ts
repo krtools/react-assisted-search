@@ -114,11 +114,9 @@ describe('AssistedSearchOptions', () => {
       expect(store.input.value).eq('a');
     });
 
-    it('allow custom values passing test function', () => {
-    });
+    it('allow custom values passing test function', () => {});
 
-    it('disallow custom values failing test function', () => {
-    });
+    it('disallow custom values failing test function', () => {});
   });
 
   describe('options.getDropdown', () => {
@@ -149,8 +147,7 @@ describe('AssistedSearchOptions', () => {
   });
 
   describe.skip('options.rewriteValue', () => {
-    it('rewrites values from custom input', () => {
-    });
+    it('rewrites values from custom input', () => {});
   });
 
   describe('options.minLength', () => {

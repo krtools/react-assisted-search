@@ -97,5 +97,3 @@ async function tsBuild() {
     stdio: 'inherit'
   });
 }
-
-

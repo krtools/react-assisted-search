@@ -535,7 +535,7 @@ export default class AssistedSearchStore {
    * @param {number[]} items
    */
   @action
-  public selectExact(items: number[] | number, closeDropdown=false): void {
+  public selectExact(items: number[] | number, closeDropdown = false): void {
     this.setSelectedItems(typeof items === 'number' ? [items] : items);
     this.setSelection(closeDropdown);
   }

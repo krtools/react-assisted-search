@@ -146,7 +146,7 @@ export default class UserEventDispatcher {
   };
 
   tab = (e: SyntheticEvent<HTMLInputElement>) => {
-    if (this.store.hasSelectedItems() || this.store.isActiveEntry() && this.store.input.facet) {
+    if (this.store.hasSelectedItems() || (this.store.isActiveEntry() && this.store.input.facet)) {
       this.store.setSelection(this.store.isSingle());
       e.preventDefault();
     }
@@ -208,6 +208,5 @@ export default class UserEventDispatcher {
   /**
    * Toggle the selected status of the highlighted item in the dropdown
    */
-  space(): void {
-  }
+  space(): void {}
 }

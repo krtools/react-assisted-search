@@ -20,9 +20,9 @@ const KEYS = {
   187: '=',
   188: '<',
   189: '-',
-  190: '>',
+  190: '>'
 } as {
-  [key: number] : string
+  [key: number]: string;
 };
 
 export type GetKeyHandlerMap = () => {

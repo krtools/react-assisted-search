@@ -34,22 +34,18 @@ describe('AssistedSearchStore', () => {
   });
 
   describe('options.customDropdown', () => {
-      let store: AssistedSearchStore;
+    let store: AssistedSearchStore;
 
     before(() => {
       store = storeWithChangeHandler({
         type: 'faceted',
-        getFacets: () => ['A','B'],
-        getValues: () => ['a','b'],
+        getFacets: () => ['A', 'B'],
+        getValues: () => ['a', 'b']
       });
     });
 
-    it.skip('deploys custom dropdown without getValues', ()=> {
+    it.skip('deploys custom dropdown without getValues', () => {});
 
-    });
-
-    it.skip('falls back to default getValues when return value is undefined', () => {
-
-    });
+    it.skip('falls back to default getValues when return value is undefined', () => {});
   });
 });

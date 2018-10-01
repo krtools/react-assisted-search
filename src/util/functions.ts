@@ -26,7 +26,7 @@ export function invokeAll(functions: Function[], args: any[], ignoreErrors = tru
  *
  * @param getFunction
  */
-export function delegate(getFunction: () => any) : any {
+export function delegate(getFunction: () => any): any {
   return function() {
     let fn = getFunction();
     if (fn) {

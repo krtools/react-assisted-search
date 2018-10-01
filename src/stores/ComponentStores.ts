@@ -41,9 +41,9 @@ export interface Dropdown {
 
   /** Is non-null/undefined if content is loading, and there is a custom loading component/value to display */
   loading?: any;
-  
+
   loadingDropdown?: any;
-  
+
   /** Is non-null/undefined if content is loading, and there is a custom loading component/value to display */
   error?: any;
 
