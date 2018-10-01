@@ -1,0 +1,15 @@
+path.state {
+  fill: #ccd1da;
+
+  stroke: white;
+  stroke-opacity: 1;
+  stroke-width: 0.5px;
+
+  &.selected {
+    fill: #00f;
+  }
+  &:hover,
+  &.selected:hover {
+    fill: #6cc6ff;
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "target": "es5",
+    "lib": [
+      "esnext",
+      "dom"
+    ],
+    "pretty": true,
+    "moduleResolution": "node",
+    "module": "es6",
+    "declaration": true,
+    "skipLibCheck": true,
+    "outDir": "es",
+    "jsx": "react",
+    "sourceMap": false,
+    "typeRoots": [
+      "node_modules/@types"
+    ]
+  },
+  "files": [
+    "src/index.ts"
+  ],
+  "exclude": [
+    "stories/examples/scratch/**/*"
+  ]
+}

@@ -1,0 +1,15 @@
+// bootstrappy
+.assisted-search {
+  border: 1px solid #ccc;
+  border-radius: 3px;
+
+  &.focused {
+    border: 1px solid blue;
+  }
+
+  &-base-dropdown {
+    border: 1px solid #ccc;
+    margin: 1px -1px 0 -1px;
+    padding: 1px 1px;
+  }
+}

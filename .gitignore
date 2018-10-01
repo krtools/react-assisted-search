@@ -1,0 +1,7 @@
+.idea/
+node_modules/
+coverage/
+yarn-error.log
+storybook-static/
+dist/
+es/
