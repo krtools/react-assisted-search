@@ -13,6 +13,7 @@ $selection-color: #fff;
     box-shadow: 3px 3px 3px -1px #ccc;
     z-index: 1;
     top: 100%;
+    left: 0;
     position: absolute;
   }
 
@@ -70,6 +71,11 @@ $selection-color: #fff;
       border-radius: 4px;
       color: white;
     }
+
+    &.selected &-entry-value {
+      color: white;
+    }
+
     &.selected &-facet {
       color: #ddd;
     }
@@ -93,6 +99,7 @@ $selection-color: #fff;
         border-radius: 20px;
         font-size: 90%;
         user-select: none;
+        font-family: sans-serif;
 
         &:hover {
           background: #666;

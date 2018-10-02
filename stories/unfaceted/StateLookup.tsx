@@ -4,7 +4,7 @@ import AssistedSearch from '../../src/AssistedSearch';
 import {AssistedSearchType} from '../../src/stores/AssistedSearchType';
 
 import '../../src/styles/assisted-search.scss';
-import '../../src/styles/assisted-search-bootstrap.scss';
+import '../../src/styles/assisted-search-bootstrap3.scss';
 
 import {lookupStates, lookupWithStateCodes, getDropdown, STATE} from '../lookups';
 import {AllowCustomValue, RewriteValue, AssistedSearchOptions} from '../../src/types';
@@ -23,7 +23,7 @@ export interface StateLookupProps {
 export default class StateLookup extends React.Component<StateLookupProps> {
   render() {
     let {type, customValues, rewriteValue, noDupes, labels, customMenuItem, customDropdown} = this.props;
-    
+
     let getOptionTemplate;
     if (customMenuItem) {
       getOptionTemplate = (facet, value) => {
@@ -40,12 +40,12 @@ export default class StateLookup extends React.Component<StateLookupProps> {
         );
       };
     }
-    
+
     let getCustomDropdown;
     if (customDropdown) {
       getCustomDropdown = (facet, store) => getDropdown({value: STATE}, store);
     }
-    
+
     let options: AssistedSearchOptions = {
       // can also just be "single"
       type: type || 'single',
@@ -57,7 +57,7 @@ export default class StateLookup extends React.Component<StateLookupProps> {
       getValues: noDupes ? getValuesNoDupes : labels ? lookupWithStateCodes : lookupStates,
       placeholder: 'States'
     };
-    
+
     return <AssistedSearch options={options}/>;
   }
 }

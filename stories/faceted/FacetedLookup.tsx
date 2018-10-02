@@ -3,7 +3,7 @@ import * as React from 'react';
 import AssistedSearch from '../../src/AssistedSearch';
 
 import '../../src/styles/assisted-search.scss';
-import '../../src/styles/assisted-search-bootstrap.scss';
+import '../../src/styles/assisted-search-bootstrap3.scss';
 
 
 import {getValues, getFacets, getDropdown} from '../lookups';
@@ -22,7 +22,7 @@ export interface FacetedLookupProps {
 export default class FacetedLookup extends React.Component<FacetedLookupProps> {
   render() {
     let {customValues, customDropdown, rewriteValue, standalone} = this.props;
-    
+
     let options: AssistedSearchOptions = {
       // can also just be "single"
       autoSelectFirst: true,
@@ -36,7 +36,7 @@ export default class FacetedLookup extends React.Component<FacetedLookupProps> {
       isStandaloneValue: standalone ? isFilter : null,
       placeholder: 'Placeholder'
     };
-    
+
     return <AssistedSearch options={options}/>;
   }
 }
