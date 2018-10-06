@@ -10,7 +10,7 @@ let config = {
   entry: {
     'react-assisted-search': path.join(__dirname, '../src/index.ts'),
     'assisted-search': path.join(__dirname, '../src/styles/assisted-search.scss'),
-    'assisted-search-bootstrap': path.join(__dirname, '../src/styles/assisted-search-bootstrap.scss')
+    'assisted-search-bootstrap': path.join(__dirname, '../src/styles/assisted-search-bootstrap3.scss')
   },
   output: {
     filename: '[name].js',
