@@ -14,7 +14,7 @@
     "skipLibCheck": true,
     "outDir": "es",
     "jsx": "react",
-    "sourceMap": false,
+    "sourceMap": true,
     "typeRoots": [
       "node_modules/@types"
     ]

@@ -96,4 +96,6 @@ async function tsBuild() {
     cwd: ROOT,
     stdio: 'inherit'
   });
+  // remove sourcemaps
+  del(`${ES}/**/*.map`);
 }
