@@ -606,6 +606,12 @@ export default class AssistedSearchStore {
     let input = this.activeElement;
     // If cursor != 0, or text selected, delete characters
     // If no entry behind us, do nothing
+    let selected = this.getSelectedEntries();
+    if (selected.length) {
+      this._deleteSelectedEntries();
+      return;
+    }
+
     if (input.selectionStart > 0 || input.selectionStart !== input.selectionEnd) {
       return;
     }
@@ -722,7 +728,7 @@ export default class AssistedSearchStore {
     return (
       dropdown.content ||
       (dropdown.items &&
-      dropdown.items.length > 0 && //
+        dropdown.items.length > 0 && //
         // min length requirement (won't search either)
         input.value.length >= this.minLength())
     ); //

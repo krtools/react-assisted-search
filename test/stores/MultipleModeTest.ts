@@ -1,6 +1,6 @@
 import 'mocha';
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
-import {createPartial, toEntries, toOptions} from '../../src/util/convertValues';
+import {createPartial, toEntries, toFacetValue, toOptions} from '../../src/util/convertValues';
 import {expect} from 'chai';
 import sleep from '../../src/util/sleep';
 import {expectEntry, expectFocus, storeWithChangeHandler} from '../utils';
@@ -270,6 +270,17 @@ describe('Multiple Mode', () => {
       // finally last backspace does nothing
       store.setInput('');
       expect(store.deleteBehind()).eq(undefined);
+    });
+
+    it('deletes selected entries', () => {
+      store.setEntries([toFacetValue('a', 'b'), toFacetValue('c', 'd'), toFacetValue('e', 'f')]);
+      expect(store.entries).lengthOf(3);
+      store.setInput('a');
+      store.setInputSelection(0, 1);
+      store.selectEntries(store.entries);
+      expect(store.getSelectedEntries()).lengthOf(3);
+      expect(store.deleteBehind()).eq(undefined);
+      expect(store.entries).lengthOf(0);
     });
 
     it('deleting from entries[0] deletes active entry and focuses main input', () => {
