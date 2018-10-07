@@ -7,7 +7,11 @@ import {spy} from 'sinon';
 import SingleValue, {SingleValueProps} from '../../src/impl/SingleValue';
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
 import {SearchEntry} from '../../src/types';
-import {expectEntry, expectStoreSynced} from '../utils';
+import {expectDropdown, expectEntry, expectStoreSynced} from '../utils';
+import sleep from '../../src/util/sleep';
+import {AssistedSearch, FullWidthDropdown} from '../../src';
+import {Simulate} from 'react-dom/test-utils';
+import drop = Simulate.drop;
 
 describe('<SingleValue>', () => {
   it('value in store matches initial prop value', () => {
@@ -73,6 +77,49 @@ describe('<SingleValue>', () => {
       expect(store.input.value).eq('abcd');
       expectEntry(store, 0, null, 'abcd', 1);
       expect(fn.callCount).eq(1);
+    });
+  });
+
+  describe('dom props', () => {
+    it('passes className and style to top component', () => {
+      let el = mount(<SingleValue className="hello" style={{color: 'red'}}/>);
+      let div = el.find('.assisted-search').getDOMNode() as HTMLDivElement;
+
+      expect(div).not.eq(undefined);
+      expect(div.classList.contains('hello'), 'should have hello class on top container').eq(true);
+      expect(div.style.color).eq('red');
+    });
+  });
+
+  describe('options.getDropdown', () => {
+    it('returns custom dropdown in place of items', async () => {
+      let getDropdown = spy(() => (
+        <FullWidthDropdown>
+          content
+        </FullWidthDropdown>
+      ));
+
+      let store = new AssistedSearchStore({
+        getValues: () => ['A', 'B'],
+        getDropdown: getDropdown
+      });
+      let el = mount(<SingleValue store={store}/>);
+
+      store.focus();
+      store.setInput('a');
+      expectStoreSynced(el);
+
+      expect(getDropdown.callCount).eq(1);
+      await sleep();
+      expect(getDropdown.callCount).eq(2);
+      expectDropdown(store);
+      expectStoreSynced(el);
+
+      let div = el.find('.assisted-search').getDOMNode() as HTMLDivElement;
+      expect(div).not.eq(undefined);
+      let dropdown = div.querySelector('.assisted-search-base-dropdown');
+      expect(dropdown).not.eq(undefined);
+      expect(dropdown.textContent).eq('content');
     });
   });
 });

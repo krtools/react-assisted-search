@@ -113,7 +113,7 @@ export interface AssistedSearchOptions {
 
 /** Function to return a completely custom dropdown */
 export interface GetDropdown {
-  (facet: Facet | null, store: AssistedSearchStore): any;
+  (items: DropdownOption[], input: string, facet: Facet | null, store: AssistedSearchStore): any;
 }
 
 /** Function to return custom content for a dropdown item */

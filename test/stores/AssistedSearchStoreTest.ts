@@ -4,7 +4,8 @@ import {spy} from 'sinon';
 
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
 import {CHANGE, UPDATE} from '../../src/stores/EventTypes';
-import {storeWithChangeHandler} from '../utils';
+import {expectEntry, expectFacet, storeWithChangeHandler} from '../utils';
+import sleep from '../../src/util/sleep';
 
 describe('AssistedSearchStore', () => {
   describe('runInAction()', () => {
@@ -35,17 +36,40 @@ describe('AssistedSearchStore', () => {
 
   describe('options.customDropdown', () => {
     let store: AssistedSearchStore;
+    let facets = spy(() => ['A', 'B']);
+    let values = spy(() => ['a', 'b']);
 
     before(() => {
       store = storeWithChangeHandler({
         type: 'faceted',
-        getFacets: () => ['A', 'B'],
-        getValues: () => ['a', 'b']
+        getFacets: facets,
+        getValues: values,
+        getDropdown: () => 'content'
       });
     });
 
-    it.skip('deploys custom dropdown without getValues', () => {});
+    it('still loads dropdown items', async () => {
+      expect(facets.callCount).eq(0);
+      store.setInput('a');
+      expect(store.isDropdownLoading()).eq(true);
+      expect(store.dropdown.content()).eq('content');
+      expect(facets.callCount, 'facet getter called even when custom dropdown is used').eq(1);
 
-    it.skip('falls back to default getValues when return value is undefined', () => {});
+      expect(store.dropdown.content(), 'content shows up before facets return').eq('content');
+      await sleep();
+      expect(store.dropdown.content(), 'content still present after facets return').eq('content');
+      expect(store.isDropdownLoading()).eq(false);
+      store.selectExact(0);
+      expectFacet(store, 'A');
+
+      expect(values.callCount, 'values not called yet').eq(0);
+      store.setInput('b');
+      expect(values.callCount, 'values now called by updateDropdown').eq(1);
+      expect(store.dropdown.content(), 'content shows up before values return').eq('content');
+      await sleep();
+      expect(store.dropdown.content(), 'content still present after values return').eq('content');
+      store.selectExact(0);
+      expectEntry(store, 0, 'A', 'a', 1);
+    });
   });
 });

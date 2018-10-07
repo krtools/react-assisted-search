@@ -7,7 +7,8 @@ import us from 'us';
 import sleep from '../src/util/sleep';
 import USMapDropdown from './dropdowns/USMap/USMapDropdown';
 import {FullWidthDropdown} from '../src/dropdowns/FullWidthDropdown';
-import {DropdownOption, Value} from '../src/types';
+import {DropdownOption, Facet, Value} from '../src/types';
+import AssistedSearchStore from '../src/stores/AssistedSearchStore';
 
 const countries = countryList();
 
@@ -171,10 +172,12 @@ export async function lookupWithStateCodes(q) {
 
 /**
  * Return the appropriate dropdown
+ * @param items
+ * @param input
  * @param facet
  * @param store
  */
-export function getDropdown(facet, store) {
+export function getDropdown(items: DropdownOption[], input: string, facet: Facet, store: AssistedSearchStore) {
   if (!facet) {
     return null;
   }
@@ -182,8 +185,7 @@ export function getDropdown(facet, store) {
     case STATE:
       return (
         <FullWidthDropdown style={{padding: '5px 5px'}}>
-          <h4>Select a State</h4>
-          <USMapDropdown store={store} />
+          <USMapDropdown store={store}/>
         </FullWidthDropdown>
       );
     default:

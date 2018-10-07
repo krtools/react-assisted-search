@@ -48,5 +48,5 @@ export interface Dropdown {
   error?: any;
 
   /** A custom dropdown container supplied by the user for selecting values, usually undefined */
-  content?: any;
+  content?: () => any;
 }

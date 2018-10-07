@@ -119,33 +119,6 @@ describe('AssistedSearchOptions', () => {
     it('disallow custom values failing test function', () => {});
   });
 
-  describe('options.getDropdown', () => {
-    it('returns null when there is no getDropdown passed', async () => {
-      let store = new AssistedSearchStore({
-        getValues: () => ['A', 'B']
-      });
-      store.focus();
-
-      store.setInput('a');
-      await sleep();
-      expectDropdown(store);
-      expect(store.getCustomDropdown()).eq(null);
-    });
-
-    it('returns custom dropdown in place of items', async () => {
-      let getDropdown = () => 'LOADING STUFF';
-      const store = new AssistedSearchStore({
-        getValues: () => ['A', 'B'],
-        getDropdown: getDropdown
-      });
-
-      store.focus();
-      store.setInput('a');
-      await sleep();
-      expect(store.getCustomDropdown()).eq(getDropdown);
-    });
-  });
-
   describe.skip('options.rewriteValue', () => {
     it('rewrites values from custom input', () => {});
   });

@@ -7,7 +7,7 @@ import '../../src/styles/assisted-search.scss';
 import '../../src/styles/assisted-search-bootstrap3.scss';
 
 import {lookupStates, lookupWithStateCodes, getDropdown, STATE} from '../lookups';
-import {AllowCustomValue, RewriteValue, AssistedSearchOptions} from '../../src/types';
+import {AllowCustomValue, RewriteValue, AssistedSearchOptions, GetDropdown} from '../../src/types';
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
 
 export interface StateLookupProps {
@@ -41,9 +41,9 @@ export default class StateLookup extends React.Component<StateLookupProps> {
       };
     }
 
-    let getCustomDropdown;
+    let getCustomDropdown: GetDropdown;
     if (customDropdown) {
-      getCustomDropdown = (facet, store) => getDropdown({value: STATE}, store);
+      getCustomDropdown = (items, input, facet, store) => getDropdown(items, input, {value:'state'}, store);
     }
 
     let options: AssistedSearchOptions = {

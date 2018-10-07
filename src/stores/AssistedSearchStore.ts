@@ -464,13 +464,24 @@ export default class AssistedSearchStore {
   /** Setting the items in dropdown for either facet or value */
   @action
   private setDropdownItems(opts: DropdownOption[]): void {
-    this.clearDropdown();
     let dropdown = this.dropdown;
-    dropdown.content = null;
     dropdown.items = opts;
     dropdown.selected = this._autoSelect() && opts.length ? [opts[0]] : [];
+    this._setDropdownContent();
     this._setLoading(false);
     this._setDropdownError(null);
+  }
+
+  @action
+  private _setDropdownContent() {
+    // custom dropdown handler
+    this.dropdown.content = null;
+    let getDropdown = this.getCustomDropdown();
+    if (getDropdown) {
+      this.dropdown.content = () => {
+        return getDropdown(this.dropdown.items, this.getActiveInput(), this.getActiveFacet(), this);
+      };
+    }
   }
 
   /**
@@ -726,7 +737,7 @@ export default class AssistedSearchStore {
     let dropdown = this.dropdown;
 
     return (
-      dropdown.content ||
+      typeof dropdown.content === 'function' ||
       (dropdown.items &&
         dropdown.items.length > 0 && //
         // min length requirement (won't search either)
@@ -945,16 +956,7 @@ export default class AssistedSearchStore {
       // only do facet in facet mode and when we don't have a current facet
       let currentFacet = this.getActiveFacet();
 
-      // custom dropdown handler
-      let getDropdown = this.getCustomDropdown();
-      if (getDropdown) {
-        let content = getDropdown(currentFacet, this);
-        if (content !== undefined && content !== null) {
-          this._setDropdownContent(content);
-          return;
-        }
-      }
-
+      this._setDropdownContent();
       if (this.isFaceted() && !currentFacet) {
         if (opts.getFacets) {
           this._setLoading(true);
@@ -990,12 +992,6 @@ export default class AssistedSearchStore {
     } else {
       this.clearDropdown();
     }
-  }
-
-  @action
-  private _setDropdownContent(content: any) {
-    this.clearDropdown();
-    this.dropdown.content = content;
   }
 
   /**
