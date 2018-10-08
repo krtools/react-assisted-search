@@ -130,9 +130,11 @@ export default class AssistedSearch extends React.Component<AssistedSearchProps>
 
     let pending = store.input.facet ? <Pending facet={store.input.facet}/> : null;
 
+    let {style, className, ...props} = this.props;
+
     let input = (
       <AssistedInput
-        {...omit(this.props, OMITTED_PROP_KEYS)}
+        {...omit(props, OMITTED_PROP_KEYS)}
         input={store.input}
         store={store}
         placeholder={store.activeElement === store.input ? store.placeholder() : ''}
@@ -145,7 +147,14 @@ export default class AssistedSearch extends React.Component<AssistedSearchProps>
     let dropdown = store.showingDropdown() ? <DropdownWrapper store={store}/> : null;
 
     return (
-      <Container onKeyDown={this.dispatcher.handler} focused={store.isFocused()} store={store} onFocus={this._focus}>
+      <Container
+        style={style}
+        className={className}
+        onKeyDown={this.dispatcher.handler}
+        focused={store.isFocused()}
+        store={store}
+        onFocus={this._focus}
+      >
         {input}
         {dropdown}
       </Container>

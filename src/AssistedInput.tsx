@@ -1,4 +1,5 @@
 import * as React from 'react';
+import classnames from 'classnames';
 import {omit} from 'lodash';
 import AssistedSearchStore from './stores/AssistedSearchStore';
 import {SyntheticEvent} from 'react';
@@ -7,7 +8,7 @@ import {Input} from './stores/ComponentStores';
 export interface AssistedInputProps {
   input: Input;
   store: AssistedSearchStore;
-  
+
   [key: string]: any;
 }
 
@@ -16,7 +17,7 @@ export interface AssistedInputProps {
  */
 export default class AssistedInput extends React.Component<AssistedInputProps> {
   private el: HTMLInputElement;
-  
+
   private handleChange = (e: SyntheticEvent<HTMLInputElement>) => {
     let store = this.props.store;
     // for now, treating single different since it always changes the single-entry value (w/ the label)
@@ -26,15 +27,15 @@ export default class AssistedInput extends React.Component<AssistedInputProps> {
       store.setInput(e.currentTarget.value);
     }
   };
-  
+
   componentDidMount() {
     this._checkFocus();
   }
-  
+
   componentDidUpdate() {
     this._checkFocus();
   }
-  
+
   private _checkFocus() {
     let store = this.props.store;
     if (store.activeElement === this.props.input) {
@@ -43,26 +44,27 @@ export default class AssistedInput extends React.Component<AssistedInputProps> {
       }
     }
   }
-  
+
   private onFocus = (e: SyntheticEvent<HTMLInputElement>) => {
     this.props.store.focus();
     if (this.props.onFocus) {
       this.props.onFocus(e);
     }
   };
-  
+
   private _setEl = (el: HTMLInputElement) => {
     this.el = el;
   };
-  
+
   render() {
     let {children, store, input, ...props} = this.props;
-    
+
     if (store.isSingle()) {
       children = null;
     }
-    
-    let inputProps = omit(props, ['store']);
+
+    let inputProps = omit(props, ['store', 'entries']);
+
     return (
       <div className="assisted-search-input-container">
         {children}

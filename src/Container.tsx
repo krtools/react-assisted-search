@@ -1,13 +1,14 @@
 import * as React from 'react';
 import classnames from 'classnames';
 import AssistedSearchStore from './stores/AssistedSearchStore';
+import {omit} from 'lodash';
 
 export interface ContainerProps {
   children?: any;
   className?: string;
   focused?: boolean;
   store: AssistedSearchStore;
-  
+
   [key: string]: any;
 }
 
@@ -16,11 +17,11 @@ export interface ContainerProps {
  */
 export default class Container extends React.Component<ContainerProps> {
   private el: HTMLDivElement;
-  
+
   private _setRef = (el: HTMLDivElement) => {
     this.el = el;
   };
-  
+
   onBlur = () => {
     // blur happens before focus, but is also annoying to manage w/ IE & react 15
     setTimeout(() => {
@@ -29,10 +30,10 @@ export default class Container extends React.Component<ContainerProps> {
       }
     });
   };
-  
+
   render() {
-    let {children, className, focused, ...props} = this.props;
-    
+    let {children, className, focused, ...props} = omit(this.props, ['store']);
+
     return (
       <div
         className={classnames('assisted-search', {focused}, className)}
