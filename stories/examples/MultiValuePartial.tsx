@@ -19,7 +19,7 @@ export default class MultiValuePartial extends React.Component {
   }
 }
 
-function optionTemp(facet: Facet, item: DropdownOption, store: AssistedSearchStore): ReactNode | undefined {
+function optionTemp(item: DropdownOption, facet: Facet, store: AssistedSearchStore): ReactNode | undefined {
   let match = HELLO.exec(store.activeElement.value);
   if (!item.partial || !match) {
     return undefined;

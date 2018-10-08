@@ -4,13 +4,13 @@ import autoPosition from './util/autoPosition';
 
 export interface DropdownProps {
   custom?: boolean;
-  
-  [key: string] : any;
+
+  [key: string]: any;
 }
 
 export default class Dropdown extends React.Component<DropdownProps> {
   el: HTMLDivElement;
-  
+
   _setRef = (el: HTMLDivElement) => {
     this.el = el;
   };
@@ -32,10 +32,8 @@ export default class Dropdown extends React.Component<DropdownProps> {
   render() {
     let {custom, className, ...props} = this.props;
 
-    let cls = classnames('assisted-search-base-dropdown', {'assisted-search-dropdown': !custom}, className);
-
     return (
-      <div className={cls} {...props} ref={this._setRef}>
+      <div className={classnames({'assisted-search-dropdown': !custom}, className)} {...props} ref={this._setRef}>
         {this.props.children}
       </div>
     );

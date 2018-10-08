@@ -118,7 +118,7 @@ export interface GetDropdown {
 
 /** Function to return custom content for a dropdown item */
 export interface OptionTemplate {
-  (facet: Facet, item: DropdownOption, store: AssistedSearchStore): any;
+  (item: DropdownOption, facet: Facet, store: AssistedSearchStore): any;
 }
 
 /** Function to return the minlength of an input based on context */

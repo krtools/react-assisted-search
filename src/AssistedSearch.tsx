@@ -11,7 +11,7 @@ import VisualEntry from './VisualEntry';
 
 import {CHANGE, UPDATE} from './stores/EventTypes';
 import {SearchEntry, Value, AssistedSearchOptions} from './types';
-import {DropdownItems, DropdownWrapper} from './DropdownItems';
+import {DropdownWrapper} from './DropdownItems';
 import {Pending} from './Pending';
 import {Entry} from './stores/ComponentStores';
 import {delegate} from './util/functions';

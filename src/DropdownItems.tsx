@@ -4,6 +4,7 @@ import {DropdownOption} from './types';
 import AssistedSearchStore from './stores/AssistedSearchStore';
 import MenuItem from './MenuItem';
 import Dropdown from './Dropdown';
+import {FullWidthDropdown} from './dropdowns/FullWidthDropdown';
 
 export interface DropdownItemsProps {
   store: AssistedSearchStore;
@@ -20,7 +21,11 @@ export class DropdownWrapper extends React.Component<DropdownItemsProps> {
         // TODO loading indicator
         return null;
       } else {
-        return <DropdownItems store={store}/>;
+        return (
+          <FullWidthDropdown>
+            <DropdownItems store={store}/>
+          </FullWidthDropdown>
+        );
       }
     } else {
       return null;
@@ -42,7 +47,7 @@ export class DropdownItems extends React.Component<DropdownItemsProps> {
     let items = store.dropdown.items.map(item => {
       return (
         <MenuItem selected={store.isSelectedItem(item)} key={item.value} item={item} onSelect={this.onSelectItem}>
-          {template ? template(store.input.facet, item, store) : null}
+          {template ? template(item, store.input.facet, store) : null}
         </MenuItem>
       );
     });

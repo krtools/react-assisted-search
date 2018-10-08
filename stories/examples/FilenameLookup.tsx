@@ -8,13 +8,13 @@ export default class FilenameLookup extends React.Component {
   state = {
     submitted: ''
   };
-  
+
   private onChange = (value: string) => {
     this.setState({
       submitted: value
     });
   };
-  
+
   private onKeyDown = (e: any, store: AssistedSearchStore, ed: KeyboardEventDispatcher) => {
     if (store.showingDropdown() && store.hasSelectedItems() && /^[\/\\]$/.test(e.key)) {
       store.runInAction(() => {
@@ -23,7 +23,7 @@ export default class FilenameLookup extends React.Component {
       });
     }
   };
-  
+
   render() {
     let submission = (
       <React.Fragment>
@@ -33,7 +33,7 @@ export default class FilenameLookup extends React.Component {
         </div>
       </React.Fragment>
     );
-    
+
     return (
       <div>
         <SingleValue
@@ -41,13 +41,13 @@ export default class FilenameLookup extends React.Component {
           onChange={this.onChange}
           options={{
             onKeyDown: (e: any, store, ed) => {
-            
+
             },
-            optionTemplate: (f: Facet, v: DropdownOption, store: AssistedSearchStore) => {
+            optionTemplate: (v: DropdownOption, facet: Facet, store: AssistedSearchStore) => {
               let value = store.input.value;
               let bold = v.value.slice(0, value.length);
               let non = v.value.slice(value.length);
-              
+
               return (
                 <div>
                   <strong>{bold}</strong>

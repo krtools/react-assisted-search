@@ -26,7 +26,7 @@ export default class StateLookup extends React.Component<StateLookupProps> {
 
     let getOptionTemplate;
     if (customMenuItem) {
-      getOptionTemplate = (facet, value) => {
+      getOptionTemplate = (value) => {
         let metadata = value.metadata || {};
         return (
           <div>
