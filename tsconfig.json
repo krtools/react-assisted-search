@@ -8,6 +8,7 @@
       "dom"
     ],
     "pretty": true,
+    "importHelpers": true,
     "moduleResolution": "node",
     "module": "es6",
     "declaration": true,
