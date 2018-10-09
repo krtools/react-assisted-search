@@ -1,5 +1,4 @@
 import * as React from 'react';
-import classnames from 'classnames';
 import {omit} from 'lodash';
 import AssistedSearchStore from './stores/AssistedSearchStore';
 import {SyntheticEvent} from 'react';

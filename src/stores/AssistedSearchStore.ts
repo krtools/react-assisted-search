@@ -363,7 +363,7 @@ export default class AssistedSearchStore {
     }
     this._lastValue = value;
     if (this._s) {
-      this._dispatch(SUBMIT);
+      this._dispatch(SUBMIT, value[0], value[1]);
     }
     this._s = false;
   };
