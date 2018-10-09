@@ -9,3 +9,9 @@ export const UPDATE = 'update';
  * @type {string}
  */
 export const CHANGE = 'change';
+
+/**
+ * Represents an event to commit and submit the value, triggered by selecting a value from the dropdown, or
+ * pressing enter
+ */
+export const SUBMIT = 'submit';

@@ -3,7 +3,7 @@ import {expect} from 'chai';
 import {spy} from 'sinon';
 
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
-import {CHANGE, UPDATE} from '../../src/stores/EventTypes';
+import {CHANGE, SUBMIT, UPDATE} from '../../src/stores/EventTypes';
 import {expectEntry, expectFacet, storeWithChangeHandler} from '../utils';
 import sleep from '../../src/util/sleep';
 
@@ -72,4 +72,55 @@ describe('AssistedSearchStore', () => {
       expectEntry(store, 0, 'A', 'a', 1);
     });
   });
+
+
+  describe('onSubmit', () => {
+    it('fires when selecting a single value', async () => {
+      let store = new AssistedSearchStore({
+        type: 'single',
+        getValues: () => ['a', 'b']
+      });
+      store.focus();
+      let fn = spy();
+      store.addListener(SUBMIT, fn);
+
+      store.setInput('a');
+      await sleep();
+      expect(fn.callCount).eq(0);
+
+      store.setValue('ab');
+      await sleep();
+      expect(fn.callCount).eq(0);
+
+      store.selectExact(0);
+      expect(fn.callCount).eq(1);
+    });
+
+    it('fires submit events only when selecting facet values', async () => {
+      let store = new AssistedSearchStore({
+        type:'faceted',
+        getFacets: () => ['A', 'B'],
+        getValues: () => ['a', 'b']
+      });
+      store.focus();
+
+      let listener = spy();
+      store.addListener(SUBMIT,listener);
+
+      // setting candidate facet
+      store.setInput('a');
+      expect(listener.callCount).eq(0);
+      await sleep();
+      store.selectExact(0);
+      expectFacet(store, 'A');
+      expect(listener.callCount).eq(0);
+
+      // setting value of entry 0
+      store.setInput('a');
+      await sleep();
+      expect(listener.callCount).eq(0);
+      store.selectExact(0);
+      expect(listener.callCount).eq(1);
+    });
+  })
 });

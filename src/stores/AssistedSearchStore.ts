@@ -9,7 +9,7 @@ import {
   AssistedSearchOptions
 } from '../types';
 
-import {CHANGE, UPDATE} from './EventTypes';
+import {CHANGE, SUBMIT, UPDATE} from './EventTypes';
 import {newEntry, newInput, toEntries, toEntry, toFacets, toOptions} from '../util/convertValues';
 import {invokeAll} from '../util/functions';
 import {Dropdown, Entry, Input} from './ComponentStores';
@@ -347,6 +347,9 @@ export default class AssistedSearchStore {
   /** Is true if we're suppressing change events */
   private _c: boolean;
 
+  /** True if next update should trigger a submit event */
+  private _s: boolean = false;
+
   /** Dispatch the update event to any listeners. Note that additional changes will trigger a secondary update event */
   private _update = (): void => {
     // change _u first in case callback forces another update
@@ -359,6 +362,10 @@ export default class AssistedSearchStore {
       this._dispatch(CHANGE, value[0], value[1]);
     }
     this._lastValue = value;
+    if (this._s) {
+      this._dispatch(SUBMIT);
+    }
+    this._s = false;
   };
 
   /**
@@ -526,7 +533,7 @@ export default class AssistedSearchStore {
   public setSelectedItem(item: number, submit?: boolean, closeDropdown?: boolean): void {
     this.setSelectedItems([item]);
     if (submit) {
-      this.setSelection(closeDropdown);
+      this.setSelection(closeDropdown, submit);
     }
   }
 
@@ -544,11 +551,13 @@ export default class AssistedSearchStore {
   /**
    * Select dropdown items (or a single dropdown item) by their exact position, useful for programmatic use.
    * @param {number[]} items
+   * @param closeDropdown if true, always closes the dropdown after the action completes
+   * @param submit if true, fires a submit event
    */
   @action
-  public selectExact(items: number[] | number, closeDropdown = false): void {
+  public selectExact(items: number[] | number, closeDropdown: boolean = false, submit?: boolean): void {
     this.setSelectedItems(typeof items === 'number' ? [items] : items);
-    this.setSelection(closeDropdown);
+    this.setSelection(closeDropdown, submit);
   }
 
   /**
@@ -999,7 +1008,8 @@ export default class AssistedSearchStore {
    * Only applicable in faceted or multiple mode
    * @private
    */
-  private _addValues(): void {
+  @action
+  private _addValues(submit?: boolean): void {
     // TODO: break by type, i think
     let activeFacet = this.getActiveFacet();
     let value: Value = this.dropdown.selected[0];
@@ -1028,15 +1038,18 @@ export default class AssistedSearchStore {
     this._addEntry({
       facet: activeFacet,
       value: value
-    });
+    }, submit);
   }
 
   @action
-  private _addEntry(entry: SearchEntry): void {
+  private _addEntry(entry: SearchEntry, submit?: boolean): void {
     if (!this.isSingle()) {
       this.entries.push(newEntry(entry));
     } else {
       this.entries = [newEntry(entry)];
+    }
+    if (submit !== false) {
+      this.submit();
     }
   }
 
@@ -1059,8 +1072,13 @@ export default class AssistedSearchStore {
     entries.splice(idx, 1);
   }
 
+  /**
+   * Enter the current selection of the dropdown into a value, or the new current facet, if appropriate.
+   * @param closeDropdown
+   * @param submit
+   */
   @action
-  public setSelection(closeDropdown?: boolean): void {
+  public setSelection(closeDropdown?: boolean, submit?: boolean): void {
     // in single mode, with custom values, we simply change the value of the input rather than having the value in a
     // "bubble"
     let selected = this.dropdown.selected[0];
@@ -1074,7 +1092,7 @@ export default class AssistedSearchStore {
         this.input.value = selected.value;
       }
       this.entries = [];
-      this._addValues();
+      this._addValues(submit);
     } else {
       let activeEntry = this.getActiveEntry();
       if (activeEntry) {
@@ -1088,7 +1106,7 @@ export default class AssistedSearchStore {
             this.input.value = '';
           }
         } else {
-          this._addValues();
+          this._addValues(submit);
         }
       }
     }
@@ -1099,6 +1117,12 @@ export default class AssistedSearchStore {
     if (!closeDropdown || (this.activeElement === this.input && this.input.facet)) {
       this.updateDropdown();
     }
+  }
+
+  /** Fire a submission event after the current transaction terminates */
+  @action
+  public submit(): void {
+    this._s = true;
   }
 
   @action
@@ -1129,7 +1153,7 @@ export default class AssistedSearchStore {
     if (value !== undefined) {
       this.input.value = typeof value === 'string' ? value : value.value;
       if (this.isSingle()) {
-        this._addEntry(toEntry(value));
+        this._addEntry(toEntry(value), false);
       }
     }
     if (entries !== undefined) {

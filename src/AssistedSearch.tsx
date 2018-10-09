@@ -9,7 +9,7 @@ import Container from './Container';
 import AssistedInput from './AssistedInput';
 import VisualEntry from './VisualEntry';
 
-import {CHANGE, UPDATE} from './stores/EventTypes';
+import {CHANGE, SUBMIT, UPDATE} from './stores/EventTypes';
 import {SearchEntry, Value, AssistedSearchOptions} from './types';
 import {DropdownWrapper} from './DropdownItems';
 import {Pending} from './Pending';
@@ -52,6 +52,14 @@ export interface AssistedSearchProps {
   onChange?: (val: string, entries: SearchEntry[], store: AssistedSearchStore) => any;
 
   /**
+   * Fires when a user explicitly selects a value from the dropdown, or when they hit the enter key
+   * @param val
+   * @param entries
+   * @param store
+   */
+  onSubmit?: (val: string, entries: SearchEntry[], store: AssistedSearchStore) => any;
+
+  /**
    * A custom-configured store component. This store is configured automatically when using one of the provided
    * react components for each mode.
    */
@@ -88,6 +96,7 @@ export default class AssistedSearch extends React.Component<AssistedSearchProps>
     this.store = store;
     this.store.addListener(UPDATE, this._update);
     this.store.addListener(CHANGE, delegate(() => this.props.onChange));
+    this.store.addListener(SUBMIT, delegate(() => this.props.onSubmit));
     if (this.props.onAll) {
       this.store.addListener('all', this.props.onAll);
     }
