@@ -152,3 +152,18 @@ export function createPartial(value: string, label?: string): DropdownOption {
     partial: true
   };
 }
+
+/**
+ * Like lodash.omit
+ *
+ * @param object
+ * @param keys
+ */
+export function omit<T>(object: object, ...keys: Array<string | string[]>): T & any {
+  let newObj = Object.assign({}, object);
+  let ks = [].concat(...keys);
+  for (let i = 0; i < ks.length; i++) {
+    delete newObj[ks[i]];
+  }
+  return newObj;
+}

@@ -1,5 +1,5 @@
 import 'mocha';
-import {toEntry, toFacet, toOption, toOptions, toValue} from '../../src/util/convertValues';
+import {omit, toEntry, toFacet, toOption, toOptions, toValue} from '../../src/util/convertValues';
 import {expect} from 'chai';
 import {DropdownOption, Facet, SearchEntry, Value} from '../../src/types';
 
@@ -85,5 +85,27 @@ describe('toOptions', () => {
   it('handles promise for mixed types', async () => {
     let opts: DropdownOption[] = await toOptions(Promise.resolve([{value: 'a'}, 'b']));
     expect(opts).eql([{value: 'a'}, {value: 'b'}] as DropdownOption[]);
+  });
+});
+
+describe('omit', () => {
+  it('omits to empty', () => {
+    expect(omit({a: 'b'}, 'a')).eql({});
+    expect(omit({a: 'b'}, 'a', 'b')).eql({});
+    expect(omit({a: 'b'}, ['a'])).eql({});
+    expect(omit({a: 'b'}, ['a', 'b'])).eql({});
+  });
+
+  it('omits multiple', () => {
+    expect(omit({a: 'b', c: 'd', d: 'e'}, 'a', 'd')).eql({c: 'd'});
+    expect(omit({a: 'b', c: 'd', d: 'e'}, ['a', 'd'])).eql({c: 'd'});
+  });
+
+  it('omits w/ leftovers', () => {
+    expect(omit({a: 'b', c: 'd'}, 'a')).eql({c: 'd'});
+    expect(omit({a: 'b', c: 'd'}, ['a'])).eql({c: 'd'});
+    expect(omit({a: 'b', c: 'd'}, ['a', 'b'])).eql({c: 'd'});
+    expect(omit({a: 'b', c: 'd'}, ['a', 'b'])).eql({c: 'd'});
+    expect(omit({a: 'b', c: 'd'}, 'a', 'b')).eql({c: 'd'});
   });
 });

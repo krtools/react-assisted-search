@@ -1,7 +1,7 @@
 import * as React from 'react';
 import classnames from 'classnames';
 import AssistedSearchStore from './stores/AssistedSearchStore';
-import {omit} from 'lodash';
+import {omit} from './util/convertValues';
 
 export interface ContainerProps {
   children?: any;

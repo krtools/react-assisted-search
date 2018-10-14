@@ -3,8 +3,7 @@ import * as React from 'react';
 import {GetFacets, GetValues} from '../types';
 import AssistedSearchStore from '../stores/AssistedSearchStore';
 import AssistedSearch, {AssistedSearchProps} from '../AssistedSearch';
-
-import {omit} from 'lodash';
+import {omit} from '../util/convertValues';
 
 export interface FacetedValueProps extends AssistedSearchProps {
   /** A callback to return the values for autocomplete */
@@ -27,7 +26,7 @@ const OMITTED_PROPS = ['getValues', 'getFacets', 'store', 'options'];
  */
 export default class FacetedValue extends React.Component<FacetedValueProps> {
   _store: AssistedSearchStore;
-  
+
   constructor(props: FacetedValueProps) {
     super(props);
     this._store =
@@ -44,7 +43,7 @@ export default class FacetedValue extends React.Component<FacetedValueProps> {
         }
       );
   }
-  
+
   render() {
     return <AssistedSearch store={this._store} {...omit(this.props, OMITTED_PROPS)} />;
   }

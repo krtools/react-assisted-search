@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import {scrollIfNeeded} from './util/scrollIfNeeded';
 import {DropdownOption} from './types';
 import {SyntheticEvent} from 'react';
-import {omit} from 'lodash';
+import {omit} from './util/convertValues';
 
 export interface MenuItemProps {
   onSelect: (item: DropdownOption) => any,

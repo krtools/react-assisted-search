@@ -1,8 +1,8 @@
 import * as React from 'react';
-import {omit} from 'lodash';
 import AssistedSearchStore from './stores/AssistedSearchStore';
 import {SyntheticEvent} from 'react';
 import {Input} from './stores/ComponentStores';
+import {omit} from './util/convertValues';
 
 export interface AssistedInputProps {
   input: Input;

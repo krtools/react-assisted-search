@@ -2,10 +2,9 @@ import * as React from 'react';
 
 import AssistedSearchStore from '../stores/AssistedSearchStore';
 import AssistedSearch, {AssistedSearchProps} from '../AssistedSearch';
-import {toValue} from '../util/convertValues';
+import {omit, toValue} from '../util/convertValues';
 
 import {GetValues} from '../types';
-import {omit} from 'lodash';
 
 export interface SingleValueProps extends AssistedSearchProps {
   /**

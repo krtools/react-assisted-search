@@ -1,4 +1,4 @@
-import {range} from 'lodash';
+import range from 'lodash/range';
 
 /**
  * A simple class to track a list of selected items in a list. Requires number-based indexes. Includes methods

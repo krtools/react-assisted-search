@@ -147,7 +147,7 @@ export default class UserEventDispatcher {
 
   tab = (e: SyntheticEvent<HTMLInputElement>) => {
     if (this.store.hasSelectedItems() || (this.store.isActiveEntry() && this.store.input.facet)) {
-      this.store.setSelection(this.store.isSingle());
+      this.store.setSelection(this.store.isSingle(), false);
       e.preventDefault();
     }
   };

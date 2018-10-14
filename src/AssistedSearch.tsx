@@ -3,8 +3,6 @@ import * as React from 'react';
 import AssistedSearchStore from './stores/AssistedSearchStore';
 import UserEventDispatcher from './stores/KeyboardEventDispatcher';
 
-import {omit} from 'lodash';
-
 import Container from './Container';
 import AssistedInput from './AssistedInput';
 import VisualEntry from './VisualEntry';
@@ -15,6 +13,7 @@ import {DropdownWrapper} from './DropdownItems';
 import {Pending} from './Pending';
 import {Entry} from './stores/ComponentStores';
 import {delegate} from './util/functions';
+import {omit} from './util/convertValues';
 
 export interface AssistedSearchProps {
   /**
@@ -68,7 +67,7 @@ export interface AssistedSearchProps {
   [key: string]: any;
 }
 
-const OMITTED_PROP_KEYS = ['onAll', 'options', 'onChange'];
+const OMITTED_PROP_KEYS = ['value', 'entries', 'options', 'onAll', 'onChange', 'onSubmit', 'store'];
 
 /**
  * The main container and entry point.
