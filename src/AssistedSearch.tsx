@@ -119,6 +119,7 @@ export default class AssistedSearch extends React.Component<AssistedSearchProps>
 
   render() {
     let store = this.store;
+    let {style, className, useLabel, ...props} = this.props;
 
     // TODO: move entries into own component, need an EntryContainer
     let entries;
@@ -132,6 +133,7 @@ export default class AssistedSearch extends React.Component<AssistedSearchProps>
             focused={this.store.isActiveEntry(entry)}
             selected={store.isSelectedEntry(entry)}
             store={store}
+            useLabel={useLabel}
           />
         );
       });
@@ -139,7 +141,6 @@ export default class AssistedSearch extends React.Component<AssistedSearchProps>
 
     let pending = store.input.facet ? <Pending facet={store.input.facet}/> : null;
 
-    let {style, className, ...props} = this.props;
 
     let input = (
       <AssistedInput

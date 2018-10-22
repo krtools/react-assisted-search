@@ -73,12 +73,12 @@ export function toOptions(opts: ValidDropdownOptions): Promise<DropdownOption[]>
     return Promise.resolve([]);
   }
 
-  if (opts instanceof Promise) {
-    return opts.then(toOptions);
-  }
-
   if (Array.isArray(opts)) {
     return Promise.resolve(opts.map(toOption));
+  }
+
+  if (typeof opts.then === 'function') {
+    return opts.then(toOptions);
   }
 }
 

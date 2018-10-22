@@ -108,7 +108,7 @@ export default class VisualEntry extends React.Component<VisualEntryProps> {
 
     let entryFacet = searchEntry.facet ? (
       <span className="assisted-search-entry-facet" onClick={this._focusEntry}>
-        {searchEntry.facet.value}
+        {this.props.useLabel ? searchEntry.facet.label : searchEntry.facet.value}
       </span>
     ) : null;
 
