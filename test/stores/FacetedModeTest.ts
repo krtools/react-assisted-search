@@ -244,4 +244,19 @@ describe('Faceted Mode', () => {
       expectFacet(store, 'a x');
     });
   });
+
+  describe('options.rewriteFacet', () => {
+    it('can rewrite facet value coming from user input', () => {
+      let store = new AssistedSearchStore({
+        type: 'faceted',
+        rewriteFacet: str => str + '_rewrite'
+      }).focus();
+
+      store.setInput('facet');
+      store.setSelection(true);
+
+      expect(store.input.facet).not.eq(undefined);
+      expect(store.input.facet.value).eq('facet_rewrite');
+    });
+  });
 });

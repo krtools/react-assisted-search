@@ -10,7 +10,7 @@ import {
 } from '../types';
 
 import {CHANGE, SUBMIT, UPDATE} from './EventTypes';
-import {newEntry, newInput, toEntries, toEntry, toFacets, toOptions} from '../util/convertValues';
+import {newEntry, newInput, toEntries, toEntry, toFacet, toFacets, toOptions} from '../util/convertValues';
 import {invokeAll} from '../util/functions';
 import {Dropdown, Entry, Input} from './ComponentStores';
 import {action, dropdownAction} from '../decorators/action';
@@ -126,10 +126,11 @@ export default class AssistedSearchStore {
    * @param end set the selectionEnd value
    */
   @action
-  public focus(entry?: Entry | number, clearSelections: boolean = true, start?: number, end?: number): void {
+  public focus(entry?: Entry | number, clearSelections: boolean = true, start?: number, end?: number): AssistedSearchStore {
     entry = this._entry(entry);
     this.focusInput(entry ? entry.input : this.input, clearSelections, start, end);
     this.deselectEntries();
+    return this;
   }
 
   /** convenience to get an Entry by it value or array index */
@@ -928,7 +929,7 @@ export default class AssistedSearchStore {
       // just setting the facet candidate from the selected item in the dropdown
       let facet: Facet = this.dropdown.selected[0];
       if (!facet && value && this.options.customFacets) {
-        facet = {value};
+        facet = toFacet(opts.rewriteFacet ? opts.rewriteFacet(value, this) : value);
       }
       if (facet) {
         input.facet = facet;

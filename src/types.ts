@@ -103,6 +103,11 @@ export interface AssistedSearchOptions {
   isStandaloneValue?: (input: string) => boolean;
 
   /**
+   * Use this to programmatically rewrite any facet submitted to the component from the user
+   */
+  rewriteFacet?: (facet: string, store: AssistedSearchStore) => string | Facet;
+
+  /**
    * Use this to programmatically rewrite any value submitted to the component
    */
   rewriteValue?: RewriteValue;

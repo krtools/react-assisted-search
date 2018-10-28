@@ -19,7 +19,6 @@ export default class FacetedValueExample extends React.Component<any, FacetedVal
   };
 
   change = (e: any, entries: SearchEntry[], store: AssistedSearchStore) => {
-    debugger;
     this.setState({
       entries: store.entries.map(e => e.entry),
       input: store.input
