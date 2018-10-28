@@ -3,6 +3,7 @@ import * as React from 'react';
 import {mount, ReactWrapper} from 'enzyme';
 import {spy} from 'sinon';
 import {expect} from 'chai';
+
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
 import {expectArgs, expectEntry, expectStoreSynced} from '../utils';
 import {toFacetValue} from '../../src/util/convertValues';
@@ -71,5 +72,30 @@ describe('<FacetedValue>', () => {
       expectEntry(store, 1, 'c', 'd', 2);
       expect(fn.callCount).eq(1);
     });
+  });
+
+  it('Entry uses label when label is included', () => {
+    let store = new AssistedSearchStore({
+      type: 'faceted'
+    });
+
+    store.focus();
+    store.setEntries([{
+      facet: {value: 'A', label: 'Ehh'},
+      value: {value: 'a'}
+    }]);
+
+    let el = mount(<FacetedValue store={store}/>);
+    let val = el.find('.assisted-search-entry-facet');
+    expect(val).lengthOf(1);
+    expect((val.getDOMNode() as HTMLElement).innerText).eq('Ehh');
+
+    store.setEntries([{
+      facet: {value: 'A'},
+      value: {value: 'a'}
+    }]);
+    val = el.find('.assisted-search-entry-facet');
+    expect(val).lengthOf(1);
+    expect((val.getDOMNode() as HTMLElement).innerText).eq('A');
   });
 });
