@@ -69,19 +69,20 @@ export function toFacet(facet: ValidFacet): Facet {
  * @param opts
  */
 export function toOptions(opts: ValidDropdownOptions): Promise<DropdownOption[]> {
-  if (opts === null) {
-    return Promise.resolve([]);
-  }
-
-  if (opts instanceof Promise) {
-    return opts.then(toOptions);
-  }
-
   if (Array.isArray(opts)) {
     return Promise.resolve(opts.map(toOption));
   }
+  // only needs to be promise-like
+  if (opts && typeof opts.then === 'function') {
+    return opts.then(toOptions);
+  }
+  return Promise.resolve([]);
 }
 
+/**
+ * Turns a ValidDropdownOption into a DropdownOption object.
+ * @param option
+ */
 export function toOption(option: ValidDropdownOption): DropdownOption {
   return typeof option === 'string' ? {value: option} : option;
 }
