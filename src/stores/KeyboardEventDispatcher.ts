@@ -145,9 +145,18 @@ export default class UserEventDispatcher {
     }
   };
 
+  /**
+   * Select or commit the current value to the input.
+   *
+   * We will do the default browser behavior (lose focus) if no value is selected in the dropdown and no value is in
+   * the input.
+   *
+   * @param e
+   */
   tab = (e: SyntheticEvent<HTMLInputElement>) => {
-    if (this.store.hasSelectedItems() || (this.store.isActiveEntry() && this.store.input.facet)) {
-      this.store.setSelection(this.store.isSingle(), false);
+    let store = this.store;
+    if (store.hasSelectedItems() || store.activeElement && store.activeElement.value) {
+      store.setSelection(store.isSingle(), false);
       e.preventDefault();
     }
   };
@@ -208,5 +217,6 @@ export default class UserEventDispatcher {
   /**
    * Toggle the selected status of the highlighted item in the dropdown
    */
-  space(): void {}
+  space(): void {
+  }
 }
