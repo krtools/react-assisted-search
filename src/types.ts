@@ -98,9 +98,20 @@ export interface AssistedSearchOptions {
    * For example, 'country' may be a facet, but 'country:Canada' could be its own value that doesn't require a second
    * dropdown.
    *
+   * @deprecated use getEntry instead
    * @param input
    */
   isStandaloneValue?: (input: string) => boolean;
+
+  /**
+   * An optional hook for implementers to programmatically override the entry value to be set from the point of facet
+   * entry or facet value entry. Works in single/multiple mode as well.
+   *
+   * @param input the value currently in the focused input
+   * @param facet the current facet, null if we're setting a facet, or we're in multiple/single mode
+   * @param store the store
+   */
+  overrideEntry?: (input: Value, facet: Facet, store: AssistedSearchStore) => SearchEntry | null | undefined;
 
   /**
    * Use this to programmatically rewrite any facet submitted to the component from the user

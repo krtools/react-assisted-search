@@ -3,7 +3,7 @@ import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
 import {expect} from 'chai';
 import sleep from '../../src/util/sleep';
 import {expectDropdown, expectEntry, expectFacet, expectInput, expectNoFacet, expectValue} from '../utils';
-import {createPartial} from '../../src/util/convertValues';
+import {createPartial, toEntry, toValue} from '../../src/util/convertValues';
 
 describe('Faceted Mode', () => {
   describe('placeholder()', () => {
@@ -257,6 +257,68 @@ describe('Faceted Mode', () => {
 
       expect(store.input.facet).not.eq(undefined);
       expect(store.input.facet.value).eq('facet_rewrite');
+    });
+  });
+
+  describe('options.overrideEntry', () => {
+    it('can override entry when entering facet', () => {
+      let store = new AssistedSearchStore({
+        type: 'faceted',
+        overrideEntry: input => toEntry(input)
+      }).focus();
+
+      store.setInput('val');
+      store.setSelection();
+
+      expectEntry(store, 0, null, 'val');
+    });
+
+    it('can override entry when entering value', () => {
+      let store = new AssistedSearchStore({
+        type: 'faceted',
+        overrideEntry: (input, facet) => facet ? {facet, value: toValue('val')} : null
+      }).focus();
+
+      store.setInput('f1');
+      store.setSelection();
+      expectFacet(store, 'f1');
+      store.setInput('hello');
+      store.setSelection();
+      expectEntry(store, 0, 'f1', 'val');
+    });
+
+    it('can override entry when selecting facet from dropdown', async () => {
+      let store = new AssistedSearchStore({
+        type: 'faceted',
+        getFacets: () => ['A'],
+        overrideEntry: () => toEntry({value: 'val'})
+      }).focus();
+
+      store.setInput('a');
+      await sleep();
+      store.selectExact([0]);
+
+      expectEntry(store, 0, null, 'val');
+    });
+
+    it('can override entry when selecting value from dropdown', async () => {
+      let store = new AssistedSearchStore({
+        type: 'faceted',
+        getFacets: () => ['A'],
+        getValues: () => ['a'],
+        overrideEntry: (input, facet) => facet ? {facet, value: toValue('val')} : null
+      }).focus();
+
+      // setting facet, doesn't really matter, it's the value override we care about
+      store.setInput('a');
+      await sleep();
+      store.selectExact(0);
+      expectFacet(store, 'A');
+
+      store.setInput('b');
+      await sleep();
+      store.selectExact(0);
+      expectEntry(store, 0, 'A', 'val');
     });
   });
 });

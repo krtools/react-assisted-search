@@ -908,8 +908,15 @@ export default class AssistedSearchStore {
     let opts = this.options;
     let value = input.value;
     // this comes before checking selected items, manually typed in value has precedence
-
     let selected = this.dropdown.selected[0];
+
+    if (opts.overrideEntry) {
+      let entry = opts.overrideEntry(selected || {value}, null, this);
+      if (entry) {
+        this._addEntry(entry);
+        return true;
+      }
+    }
 
     if (
       selected &&
@@ -1036,10 +1043,19 @@ export default class AssistedSearchStore {
       }
     }
 
-    this._addEntry({
+    let entry: SearchEntry = {
       facet: activeFacet,
       value: value
-    }, submit);
+    };
+
+    if (this.options.overrideEntry) {
+      let override = this.options.overrideEntry(value, activeFacet, this);
+      if (override) {
+        entry = override;
+      }
+    }
+
+    this._addEntry(entry, submit);
   }
 
   @action
