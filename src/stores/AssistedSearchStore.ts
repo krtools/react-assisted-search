@@ -909,7 +909,7 @@ export default class AssistedSearchStore {
   @action
   private _setCandidateFacet(input: Input = this.activeElement): void | true {
     let opts = this.options;
-    let value = input.value;
+    let value: string | Value = input.value;
     // this comes before checking selected items, manually typed in value has precedence
     let selected = this.dropdown.selected[0];
 
@@ -931,15 +931,15 @@ export default class AssistedSearchStore {
     } else if (!selected && opts.isStandaloneValue && opts.isStandaloneValue(value)) {
       // add value
       if (this.options.rewriteValue) {
-        value = this.options.rewriteValue(value, this.getActiveFacetName(), this);
+        value = this.options.rewriteValue(toValue(value), input.facet, this);
       }
-      this._addEntry({value: {value: value}});
+      this._addEntry({value: toValue(value)});
       return true;
     } else {
       // just setting the facet candidate from the selected item in the dropdown
       let facet: Facet = this.dropdown.selected[0];
       if (!facet && value && this.options.customFacets) {
-        facet = toFacet(opts.rewriteFacet ? opts.rewriteFacet(value, this) : value);
+        facet = this._getRewrittenFacet(value);
       }
       if (facet) {
         input.facet = facet;
@@ -1030,11 +1030,8 @@ export default class AssistedSearchStore {
       if (!this.customValues(activeFacet)) {
         return;
       }
-      let inputValue = this.input.value;
-      if (this.options.rewriteValue) {
-        inputValue = this.options.rewriteValue(inputValue, this.getActiveFacetName(), this);
-      }
-      value = {value: inputValue};
+      let inputValue: string | Value = this.input.value;
+      value = toValue(inputValue);
     }
 
     // when on the main input, remove the candidate facet
@@ -1048,7 +1045,7 @@ export default class AssistedSearchStore {
 
     let entry: SearchEntry = {
       facet: activeFacet,
-      value: value
+      value: this._getRewrittenValue(value, activeFacet)
     };
 
     if (this.options.overrideEntry) {
@@ -1059,6 +1056,24 @@ export default class AssistedSearchStore {
     }
 
     this._addEntry(entry, submit);
+  }
+
+  private _getRewrittenValue(value: Value | string, facet?: Facet): Value {
+    value = toValue(value);
+    if (this.options.rewriteValue) {
+      let rewritten = this.options.rewriteValue(value, facet, this);
+      return toValue(rewritten || value);
+    }
+    return value;
+  }
+
+  private _getRewrittenFacet(facet: Facet | string): Facet {
+    facet = toFacet(facet);
+    if (this.options.rewriteFacet) {
+      let rewritten = this.options.rewriteFacet(facet, this);
+      return toFacet(rewritten || facet);
+    }
+    return facet;
   }
 
   @action

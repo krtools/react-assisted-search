@@ -1,9 +1,10 @@
 import 'mocha';
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
-import {expectDropdown, expectEntry, expectFacet, expectNoDropdown, expectNoFacet, expectValue} from '../utils';
+import {expectDropdown, expectEntry, expectNoDropdown, expectNoFacet, expectValue} from '../utils';
 import sleep from '../../src/util/sleep';
 import {expect} from 'chai';
 import {spy} from 'sinon';
+import {toValue} from '../../src/util/convertValues';
 
 describe('AssistedSearchOptions', () => {
   describe('options.autoSelectFirst', () => {
@@ -116,13 +117,49 @@ describe('AssistedSearchOptions', () => {
       expect(store.input.value).eq('a');
     });
 
-    it('allow custom values passing test function', () => {});
+    it('allow custom values passing test function', () => {
+    });
 
-    it('disallow custom values failing test function', () => {});
+    it('disallow custom values failing test function', () => {
+    });
   });
 
-  describe.skip('options.rewriteValue', () => {
-    it('rewrites values from custom input', () => {});
+  describe('options.rewriteValue', () => {
+    [toValue('abc'), 'abc'].forEach(newVal => {
+      let rewriteTo = JSON.stringify(newVal);
+      it(`rewrites values from dropdown selection, rewriting to=${rewriteTo}`, async () => {
+        let rewrite = spy(() => toValue(newVal));
+
+        let store = new AssistedSearchStore({
+          type: 'multiple',
+          rewriteValue: rewrite,
+          getValues: () => ['A']
+        }).focus();
+
+        store.setInput('a');
+        await sleep();
+
+        expect(rewrite.callCount).eq(0);
+        store.selectExact(0);
+
+        expect(rewrite.callCount).eq(1);
+
+        expectValue(store, 'abc', 0);
+      });
+
+      // this one is kinda iffy since single values are not necessarily committed but are in the input "buffer"
+      it(`rewrites values from custom input, rewriting to:${rewriteTo}`, () => {
+        let rewrite = spy(() => toValue(newVal));
+        let store = new AssistedSearchStore({
+          rewriteValue: rewrite
+        }).focus();
+
+        store.setInput('A');
+        store.setSelection();
+        expectValue(store, 'abc', 0);
+      });
+    });
+
   });
 
   describe('options.minLength', () => {

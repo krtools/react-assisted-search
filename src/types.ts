@@ -135,7 +135,7 @@ export interface AssistedSearchOptions {
   /**
    * Use this to programmatically rewrite any facet submitted to the component from the user
    */
-  rewriteFacet?: (facet: string, store: AssistedSearchStore) => string | Facet;
+  rewriteFacet?: (facet: Facet, store: AssistedSearchStore) => string | Facet;
 
   /**
    * Use this to programmatically rewrite any value submitted to the component
@@ -175,7 +175,7 @@ export interface IsAutoSelectFirst {
 
 /** Rewrites a value before committing it */
 export interface RewriteValue {
-  (input: String, facet: string, store: AssistedSearchStore): string;
+  (input: Value, facet: Facet, store: AssistedSearchStore): string | Value;
 }
 
 /**

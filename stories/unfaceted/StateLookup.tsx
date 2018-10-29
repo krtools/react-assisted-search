@@ -52,7 +52,7 @@ export default class StateLookup extends React.Component<StateLookupProps> {
       customValues: customValues === undefined ? true : customValues,
       optionTemplate: getOptionTemplate,
       getDropdown: getCustomDropdown,
-      rewriteValue: rewriteValue ? value => value + '-rewrite' : null,
+      rewriteValue: rewriteValue ? value => value.value + '-rewrite' : null,
       minLength: 0,
       getValues: noDupes ? getValuesNoDupes : labels ? lookupWithStateCodes : lookupStates,
       placeholder: 'States'

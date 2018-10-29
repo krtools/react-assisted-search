@@ -249,7 +249,7 @@ describe('Faceted Mode', () => {
     it('can rewrite facet value coming from user input', () => {
       let store = new AssistedSearchStore({
         type: 'faceted',
-        rewriteFacet: str => str + '_rewrite'
+        rewriteFacet: str => str.value + '_rewrite'
       }).focus();
 
       store.setInput('facet');
