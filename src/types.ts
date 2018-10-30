@@ -27,10 +27,11 @@ export interface AssistedSearchOptions {
 
   /**
    * How long to wait in milliseconds before showing the loading dropdown. Only applies if getLoading is specified.
+   * Set to false to completely eliminate the loading delay (it will be set synchronously).
    *
-   * Defaults to 500
+   * @default 500
    */
-  loadingDelay?: number;
+  loadingDelay?: number | false;
 
   /**
    * An optional parameter to show a loading dropdown
@@ -42,25 +43,37 @@ export interface AssistedSearchOptions {
   getLoading?: (value: string, isFacet: boolean, store: AssistedSearchStore) => ReactNode;
 
   /**
-   * If true, allows users to enter custom facet names in the component. Defaults to true.
+   * Render an error message to the dropdown when getValues or getFacets  falis
+   * @param error
+   * @param store
+   */
+  getError?: (error: any, store: AssistedSearchStore) => ReactNode;
+
+  /**
+   * If true, allows users to enter custom facet names in the component
+   *
+   * @default true
    */
   customFacets?: boolean;
 
   /**
-   * If true, allows users to enter custom values in the component. Defaults to true
+   * If true, allows users to enter custom values in the component
+   *
+   * @default true
    */
   customValues?: boolean | AllowCustomValue;
 
   /**
-   * If true, the first item in the dropdown will be selected. Defaults to false
+   * If true, the first item in the dropdown will be selected.
+   *
+   * @default false
    */
   autoSelectFirst?: boolean | IsAutoSelectFirst;
 
   /**
-   * The minimum number of characters a user must type before the dropdown will be queried and appear with suggestions.
-   * Default is 1.
+   * The minimum number of characters a user must type before the dropdown will be queried and appear with suggestions
    *
-   * @type {number}
+   * @default 1
    */
   minLength?: number | GetMinLength;
 
@@ -72,7 +85,11 @@ export interface AssistedSearchOptions {
    *!/
   getOperators?: AsyncConfigOption<string, string[]>;*/
 
-  /** The type of the assisted search we are going to render. Defaults to single */
+  /**
+   * The type of the assisted search we are going to render
+   *
+   * @default "single"
+   */
   type?: AssistedSearchType;
 
   /** Retrieve facets to use in the provided list dropdown */
@@ -107,6 +124,8 @@ export interface AssistedSearchOptions {
    * An optional hook for implementers to programmatically override the entry value to be set from the point of facet
    * entry or facet value entry. Works in single/multiple mode as well.
    *
+   *
+   * @see AssistedSearchOptions.rewriteFacet if you want only to change the facet value
    * @param input the value currently in the focused input
    * @param facet the current facet, null if we're setting a facet, or we're in multiple/single mode
    * @param store the store

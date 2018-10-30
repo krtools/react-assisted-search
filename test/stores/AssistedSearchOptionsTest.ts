@@ -27,12 +27,14 @@ describe('AssistedSearchOptions', () => {
       const loadingMsg = 'LOADING STUFF';
       const store = new AssistedSearchStore({
         getValues: () => ['A', 'B'],
-        getLoading: () => loadingMsg
+        getLoading: () => loadingMsg,
+        loadingDelay: false
       });
       store.focus();
       store.setInput('a');
       expect(store.dropdown.loading, 'dropdown should be loading').eq(true);
       expect(store.isDropdownLoading(), 'should reflect loading state').eq(true);
+      expect(store.showingDropdown()).eq(true);
       expect(store.dropdown.loadingDropdown).eq(loadingMsg);
       await sleep();
       expect(store.isDropdownLoading(), 'no longer loading').eq(false);

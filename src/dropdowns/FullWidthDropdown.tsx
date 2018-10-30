@@ -5,11 +5,12 @@ export interface FullWidthDropdownProps {
   className?: string,
   children?: any,
   style?: object,
-  [key: string] : any
+
+  [key: string]: any
 }
 
 /**
- * Convenience component to take up 100% of the input container.
+ * Convenience component to take up 100% of the input container's width.
  */
 export class FullWidthDropdown extends React.Component<FullWidthDropdownProps> {
   render() {

@@ -13,23 +13,32 @@ export interface DropdownItemsProps {
 export class DropdownWrapper extends React.Component<DropdownItemsProps> {
   render() {
     let store = this.props.store;
-    if (store.dropdown.content) {
-      return store.dropdown.content();
-    } else if (store.dropdown.items) {
-      if (!store.dropdown.items.length) {
-        // TODO empty indicator
-        // TODO loading indicator
-        return null;
-      } else {
-        return (
-          <FullWidthDropdown>
-            <DropdownItems store={store}/>
-          </FullWidthDropdown>
-        );
+    let dropdown = store.dropdown;
+
+    // should we show the loading indicator?
+    let loadingDropdown = dropdown.loadingDropdown;
+    if (loadingDropdown) {
+      if (typeof loadingDropdown === 'string') {
+        return <FullWidthDropdown>{loadingDropdown}</FullWidthDropdown>;
       }
-    } else {
-      return null;
+      return loadingDropdown;
     }
+
+    if (dropdown.error) {
+      return dropdown.error;
+    }
+
+    if (dropdown.content) {
+      return dropdown.content();
+    }
+    if (dropdown.items && dropdown.items.length) {
+      return (
+        <FullWidthDropdown>
+          <DropdownItems store={store}/>
+        </FullWidthDropdown>
+      );
+    }
+    return null;
   }
 }
 

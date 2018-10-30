@@ -47,6 +47,7 @@ export default class AssistedSearchStore {
     customFacets: true,
     type: 'single',
     minLength: 1,
+    loadingDelay: 500,
     autoSelectFirst: false
   };
 
@@ -748,6 +749,8 @@ export default class AssistedSearchStore {
 
     return (
       typeof dropdown.content === 'function' ||
+      dropdown.error ||
+      (dropdown.loadingDropdown !== undefined && dropdown.loadingDropdown !== null) ||
       (dropdown.items &&
         dropdown.items.length > 0 && //
         // min length requirement (won't search either)
@@ -1242,8 +1245,14 @@ export default class AssistedSearchStore {
   @action
   private _setLoading(loading: boolean) {
     clearTimeout(this._loadingDropdownTo);
-    this.dropdown.loadingDropdown = null;
     this.dropdown.loading = loading;
+    // don't trigger update if we don't have to
+    if (this.dropdown.loadingDropdown) {
+      this.runInAction(() => {
+        this.dropdown.loadingDropdown = null;
+      });
+    }
+
     let opts = this.options;
     let getLoading = opts.getLoading;
     if (loading && getLoading) {
@@ -1259,13 +1268,15 @@ export default class AssistedSearchStore {
     return !!this.dropdown.loading;
   }
 
+  // timer for delayed display of loading dropdown
   _loadingDropdownTo?: number;
 
-  @action
   setLoadingDropdown(value: string, isFacet: boolean) {
     // is loading delay
     let doGetLoading = () => {
-      this.dropdown.loadingDropdown = this.options.getLoading(value, isFacet, this);
+      this.runInAction(() => {
+        this.dropdown.loadingDropdown = this.options.getLoading(value, isFacet, this);
+      });
     };
     let loadingDelay = this.options.loadingDelay;
     if (typeof loadingDelay === 'number') {
@@ -1277,7 +1288,8 @@ export default class AssistedSearchStore {
 
   @action
   _setDropdownError(error: any) {
-    this.dropdown.error = error;
     this._setLoading(false);
+    let rendered = error ? this.options.getError ? this.options.getError(error, this) : null : null;
+    this.dropdown.error = rendered;
   }
 }
