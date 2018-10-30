@@ -11,8 +11,10 @@ import {
 import {Entry, Input} from '../stores/ComponentStores';
 
 export function newEntry(searchEntry: SearchEntry): Entry {
+  const value = searchEntry.value;
+
   return {
-    input: newInput(searchEntry.value ? searchEntry.value.value : ''),
+    input: newInput(value ? value.label || value.value : ''),
     entry: searchEntry
   };
 }
