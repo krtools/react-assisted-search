@@ -276,7 +276,7 @@ describe('Faceted Mode', () => {
     it('can override entry when entering value', () => {
       let store = new AssistedSearchStore({
         type: 'faceted',
-        overrideEntry: (input, facet) => facet ? {facet, value: toValue('val')} : null
+        overrideEntry: (input, facet) => (facet ? {facet, value: toValue('val')} : null)
       }).focus();
 
       store.setInput('f1');
@@ -306,7 +306,7 @@ describe('Faceted Mode', () => {
         type: 'faceted',
         getFacets: () => ['A'],
         getValues: () => ['a'],
-        overrideEntry: (input, facet) => facet ? {facet, value: toValue('val')} : null
+        overrideEntry: (input, facet) => (facet ? {facet, value: toValue('val')} : null)
       }).focus();
 
       // setting facet, doesn't really matter, it's the value override we care about

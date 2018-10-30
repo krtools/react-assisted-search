@@ -772,8 +772,8 @@ export default class AssistedSearchStore {
       entry.input.value = value;
       entry.entry.value = toValue(value);
     } else {
-      entry.input.value = value.value;
       entry.entry.value = value;
+      entry.input = newInput(value);
     }
     if (this.isActiveEntry(entry)) {
       this.updateDropdown();
@@ -1106,7 +1106,8 @@ export default class AssistedSearchStore {
     }
     if (this.isSingle()) {
       if (selected) {
-        this.input.value = selected.value;
+        // this appears to be overcome by _addValues
+        this.input = newInput(selected);
       }
       this.entries = [];
       this._addValues(submit);

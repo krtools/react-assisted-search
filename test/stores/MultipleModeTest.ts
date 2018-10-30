@@ -3,7 +3,7 @@ import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
 import {createPartial, toEntries, toFacetValue, toOptions} from '../../src/util/convertValues';
 import {expect} from 'chai';
 import sleep from '../../src/util/sleep';
-import {expectEntry, expectFocus, storeWithChangeHandler} from '../utils';
+import {expectEntry, expectFocus, expectValue, storeWithChangeHandler} from '../utils';
 
 describe('Multiple Mode', () => {
   it('able to select multiple values', async () => {
@@ -12,11 +12,15 @@ describe('Multiple Mode', () => {
 
     store.dropdown.items = await toOptions(['0123a']);
     store.selectExact(0);
-    expect(store.entries).lengthOf(1);
+    expectEntry(store, 0, null, '0123a', 1);
+    // checking to make sure input value is cleared
+    expectValue(store, '');
 
     store.dropdown.items = await toOptions(['0123b']);
     store.selectExact(0);
-    expect(store.entries).lengthOf(2);
+    expectEntry(store, 1, null, '0123b', 2);
+    // checking to make sure input value is cleared
+    expectValue(store, '');
 
     expect(store.getValues().map(e => e.value)).eql(['0123a', '0123b']);
   });

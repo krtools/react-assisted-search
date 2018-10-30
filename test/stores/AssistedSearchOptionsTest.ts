@@ -1,6 +1,6 @@
 import 'mocha';
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
-import {expectDropdown, expectEntry, expectNoDropdown} from '../utils';
+import {expectDropdown, expectEntry, expectFacet, expectNoDropdown, expectNoFacet, expectValue} from '../utils';
 import sleep from '../../src/util/sleep';
 import {expect} from 'chai';
 import {spy} from 'sinon';
@@ -80,7 +80,7 @@ describe('AssistedSearchOptions', () => {
       expectDropdown(store);
       store.setSelection();
       expect(store.input.value, 'should leave input value unchanged').eq('a');
-      expect(store.activeElement.facet).eq(undefined);
+      expectNoFacet(store);
     });
   });
 
@@ -205,6 +205,53 @@ describe('AssistedSearchOptions', () => {
         type: 'faceted'
       });
       expect(single.isFaceted()).eq(true);
+    });
+  });
+
+  describe('labels', () => {
+    it('sets input to a the label when given', async () => {
+      let store = new AssistedSearchStore({
+        type: 'faceted',
+        getValues: () => [{value: 'A', label: 'Label'}]
+      }).focus();
+
+      store.setInput('a');
+      store.setSelection();
+      store.setInput('a');
+      await sleep();
+
+      store.selectExact(0);
+      expectValue(store, 'Label', 0);
+      // checking that main input value has been cleared
+      expectValue(store, '');
+    });
+
+    it('multiple: sets input to a the label when given', async () => {
+      let store = new AssistedSearchStore({
+        type: 'multiple',
+        getValues: () => [{value: 'A', label: 'Label'}]
+      }).focus();
+
+      // set value from dropdown
+      store.setInput('a');
+      await sleep();
+      store.selectExact(0);
+
+      expectValue(store, 'Label', 0);
+    });
+
+    it('single: sets input to a the label when given', async () => {
+      let store = new AssistedSearchStore({
+        type: 'single',
+        getValues: () => [{value: 'A', label: 'Label'}]
+      }).focus();
+
+      // set value from dropdown
+      store.setInput('a');
+      await sleep();
+      store.selectExact(0);
+
+      expectValue(store, 'Label');
     });
   });
 });

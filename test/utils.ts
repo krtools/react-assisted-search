@@ -52,7 +52,7 @@ export function expectDropdown(store: AssistedSearchStore, selected?: number | n
   expect(store.dropdown.items.length, `Dropdown should have items in it`).greaterThan(0);
   if (typeof selected === 'number' || Array.isArray(selected)) {
     if (Array.isArray(selected) && selected.length === 0) {
-      expect(store.dropdown.selected, "Dropdown shouldn't have items").lengthOf(0);
+      expect(store.dropdown.selected, 'Dropdown shouldn\'t have items').lengthOf(0);
     }
     (Array.isArray(selected) ? selected : [selected]).forEach(i => {
       expect(store.isSelectedItem(i), `${i} should be selected`).eq(true);
@@ -91,7 +91,7 @@ export function expectFacet(store: AssistedSearchStore, facet?: string, entry?: 
  * Convenience to expect a value of an entry to be a certain string.
  * @param store
  * @param value
- * @param entry
+ * @param entry the entry index number, or unentered if main input
  */
 export function expectValue(store: AssistedSearchStore, value: string, entry?: number) {
   let input = store.input;
@@ -101,17 +101,24 @@ export function expectValue(store: AssistedSearchStore, value: string, entry?: n
   }
   expect(
     input.value,
-    `expecting ${input === store.input ? 'main input' : `entries[${entry}].input.value to be ${JSON.stringify(value)}`}`
+    `${input === store.input ? 'main input' : `entries[${entry}].input.value`} should be ${JSON.stringify(value)}`
   ).eq(value);
 }
 
+/**
+ * Convenience to check the input and CANDIDATE facet of the active input
+ * @param store the store
+ * @param value the expected value
+ * @param facet the candidate facet value
+ */
 export function expectInput(store: AssistedSearchStore, value: string, facet?: string | null) {
-  expect(store.input.value, `expecting input to have value '${value}'`).eq(value);
-  if (!facet === null) {
+  let input = store.input;
+  expect(input.value, `expecting input to have value '${value}'`).eq(value);
+  if (facet === null || facet === undefined) {
     expectNoFacet(store);
   } else {
-    expect(store.input.facet).not.oneOf([null, undefined]);
-    expect(store.input.facet.value, `expecting facet to be '${facet}'`).eq(facet);
+    expect(input.facet).not.oneOf([null, undefined]);
+    expect(input.facet.value, `expecting facet to be '${facet}'`).eq(facet);
   }
 }
 

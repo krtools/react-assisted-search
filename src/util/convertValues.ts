@@ -11,14 +11,18 @@ import {
 import {Entry, Input} from '../stores/ComponentStores';
 
 export function newEntry(searchEntry: SearchEntry): Entry {
+  let value = searchEntry.value;
   return {
-    input: newInput(searchEntry.value ? searchEntry.value.value : ''),
+    input: newInput(value),
     entry: searchEntry
   };
 }
 
-export function newInput(value = ''): Input {
-  return {value};
+export function newInput(value: string | Value = ''): Input {
+  return {
+    value: typeof value === 'string' ? value : value.label || value.value || '',
+    facet: null
+  };
 }
 
 /**
@@ -116,9 +120,9 @@ export function toValue(val: string | null | undefined | Value): Value {
     }
   }
 
-  return <Value>{
+  return {
     value: val || ''
-  };
+  } as Value;
 }
 
 /**
