@@ -5,6 +5,7 @@
   "main": "dist/react-assisted-search.js",
   "jsnext:main": "es/index.js",
   "module": "es/index.js",
+  "typings" : "es/index.d.ts",
   "scripts": {
     "test": "karma start karma.conf.js --single-run",
     "test:watch": "karma start karma.conf.js",
