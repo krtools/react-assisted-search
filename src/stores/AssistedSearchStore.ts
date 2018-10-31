@@ -907,13 +907,14 @@ export default class AssistedSearchStore {
    * @private
    */
   @action
-  private _setCandidateFacet(input: Input = this.activeElement): void | true {
+  private _setCandidateFacet(input: Input = this.activeElement, letOverride = true): void | true {
     let opts = this.options;
     let value: string | Value = input.value;
     // this comes before checking selected items, manually typed in value has precedence
     let selected = this.dropdown.selected[0];
 
-    if (opts.overrideEntry) {
+    // TODO: this is quite the hack to bypass override w/ tab, should just pass isSubmit to overrideEntry
+    if (opts.overrideEntry && letOverride) {
       let entry = opts.overrideEntry(selected || {value}, null, this);
       if (entry) {
         this._addEntry(entry);
@@ -1113,7 +1114,7 @@ export default class AssistedSearchStore {
    * @param submit
    */
   @action
-  public setSelection(closeDropdown?: boolean, submit?: boolean): void {
+  public setSelection(closeDropdown: boolean = false, submit: boolean = true): void {
     // in single mode, with custom values, we simply change the value of the input rather than having the value in a
     // "bubble"
     let selected = this.dropdown.selected[0];
@@ -1122,6 +1123,7 @@ export default class AssistedSearchStore {
       this.clearDropdown();
       return;
     }
+    let doSubmit = submit;
     if (this.isSingle()) {
       if (selected) {
         // this appears to be overcome by _addValues
@@ -1138,8 +1140,10 @@ export default class AssistedSearchStore {
         this.focus();
       } else {
         if (this.isFaceted() && !this.getActiveFacet()) {
-          if (this._setCandidateFacet()) {
+          if (this._setCandidateFacet(this.activeElement, submit === true)) {
             this.input.value = '';
+          } else {
+            doSubmit = false;
           }
         } else {
           this._addValues(submit);
@@ -1147,6 +1151,9 @@ export default class AssistedSearchStore {
       }
     }
 
+    if (doSubmit) {
+      this.submit();
+    }
     this.clearDropdown();
     this.focus();
     // close dropdown on enter, but not when the candidate facet is being set

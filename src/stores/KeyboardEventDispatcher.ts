@@ -177,7 +177,7 @@ export default class UserEventDispatcher {
   /** An override to enter, if in faceted mode, will accept value as an faceted value */
   enter = (e: SyntheticEvent<HTMLInputElement>) => {
     if (this._isInput(e.target as Element)) {
-      this.store.setSelection(true);
+      this.store.setSelection(true, true);
       e.preventDefault();
     }
   };
