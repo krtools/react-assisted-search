@@ -16,6 +16,8 @@ import {Dropdown, Entry, Input} from './ComponentStores';
 import {action, dropdownAction} from '../decorators/action';
 import {toValue} from '../util/convertValues';
 import {AssistedSearchType} from './AssistedSearchType';
+import {Simulate} from 'react-dom/test-utils';
+import select = Simulate.select;
 
 type ChangeSet = [string, SearchEntry[]];
 
@@ -127,7 +129,12 @@ export default class AssistedSearchStore {
    * @param end set the selectionEnd value
    */
   @action
-  public focus(entry?: Entry | number, clearSelections: boolean = true, start?: number, end?: number): AssistedSearchStore {
+  public focus(
+    entry?: Entry | number,
+    clearSelections: boolean = true,
+    start?: number,
+    end?: number
+  ): AssistedSearchStore {
     entry = this._entry(entry);
     this.focusInput(entry ? entry.input : this.input, clearSelections, start, end);
     this.deselectEntries();
@@ -907,11 +914,10 @@ export default class AssistedSearchStore {
    * @private
    */
   @action
-  private _setCandidateFacet(input: Input = this.activeElement, letOverride = true): void | true {
+  private _setCandidateFacet(input: Input = this.activeElement, selected: DropdownOption, letOverride = true): void | true {
     let opts = this.options;
     let value: string | Value = input.value;
     // this comes before checking selected items, manually typed in value has precedence
-    let selected = this.dropdown.selected[0];
 
     // TODO: this is quite the hack to bypass override w/ tab, should just pass isSubmit to overrideEntry
     if (opts.overrideEntry && letOverride) {
@@ -938,7 +944,7 @@ export default class AssistedSearchStore {
       return true;
     } else {
       // just setting the facet candidate from the selected item in the dropdown
-      let facet: Facet = this.dropdown.selected[0];
+      let facet: Facet = selected;
       if (!facet && value && this.options.customFacets) {
         facet = this._getRewrittenFacet(value);
       }
@@ -1021,12 +1027,11 @@ export default class AssistedSearchStore {
    * @private
    */
   @action
-  private _addValues(submit?: boolean): void {
+  private _addValues(value: Value, submit?: boolean): void {
     // TODO: break by type, i think
     let activeFacet = this.getActiveFacet();
-    let value: Value = this.dropdown.selected[0];
     // if no selected items, take the input as the value
-    if (!this.dropdown.selected.length) {
+    if (!value) {
       // if we don't support custom values and there is nothing selected in the dropdown, this is a no-op
       if (!this.customValues(activeFacet)) {
         return;
@@ -1109,20 +1114,42 @@ export default class AssistedSearchStore {
   }
 
   /**
+   * Enter a value into the active input and select it, this is the "manual" version of setSelection, (which works with dropdown values)
+   * @param value
+   * @param closeDropdown
+   * @param submit
+   */
+  // implicitly an action since it only calls one method which is an action
+  public selectValue(value: string | Value, closeDropdown: boolean = false, submit: boolean = true): void {
+    this._select(toValue(value), closeDropdown, submit);
+  }
+
+  /**
    * Enter the current selection of the dropdown into a value, or the new current facet, if appropriate.
    * @param closeDropdown
    * @param submit
    */
-  @action
+  // implicitly an action since it only calls one method which is an action
   public setSelection(closeDropdown: boolean = false, submit: boolean = true): void {
+    this._select(this.dropdown.selected[0], closeDropdown, submit);
+  }
+
+  /**
+   * Enter the current selection of the dropdown into a value, or the new current facet, if appropriate.
+   * @param selected
+   * @param closeDropdown
+   * @param submit
+   */
+  @action
+  private _select(selected: DropdownOption, closeDropdown: boolean = false, submit: boolean = true): void {
     // in single mode, with custom values, we simply change the value of the input rather than having the value in a
     // "bubble"
-    let selected = this.dropdown.selected[0];
     if (selected && selected.partial && this.activeElement) {
       this.activeElement.value = selected.value;
       this.clearDropdown();
       return;
     }
+
     let doSubmit = submit;
     if (this.isSingle()) {
       if (selected) {
@@ -1130,7 +1157,7 @@ export default class AssistedSearchStore {
         this.input = newInput(selected);
       }
       this.entries = [];
-      this._addValues(submit);
+      this._addValues(selected, submit);
     } else {
       let activeEntry = this.getActiveEntry();
       if (activeEntry) {
@@ -1140,13 +1167,13 @@ export default class AssistedSearchStore {
         this.focus();
       } else {
         if (this.isFaceted() && !this.getActiveFacet()) {
-          if (this._setCandidateFacet(this.activeElement, submit === true)) {
+          if (this._setCandidateFacet(this.activeElement, selected, submit === true)) {
             this.input.value = '';
           } else {
             doSubmit = false;
           }
         } else {
-          this._addValues(submit);
+          this._addValues(selected, submit);
         }
       }
     }
@@ -1311,7 +1338,7 @@ export default class AssistedSearchStore {
   @action
   _setDropdownError(error: any) {
     this._setLoading(false);
-    let rendered = error ? this.options.getError ? this.options.getError(error, this) : null : null;
+    let rendered = error ? (this.options.getError ? this.options.getError(error, this) : null) : null;
     this.dropdown.error = rendered;
   }
 }

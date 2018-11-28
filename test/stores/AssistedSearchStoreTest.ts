@@ -4,7 +4,7 @@ import {spy} from 'sinon';
 
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
 import {CHANGE, SUBMIT, UPDATE} from '../../src/stores/EventTypes';
-import {expectEntry, expectFacet, storeWithChangeHandler} from '../utils';
+import {expectEntry, expectFacet, expectInput, storeWithChangeHandler} from '../utils';
 import sleep from '../../src/util/sleep';
 
 describe('AssistedSearchStore', () => {
@@ -20,6 +20,56 @@ describe('AssistedSearchStore', () => {
       });
 
       expect(sp.callCount).eq(1);
+    });
+  });
+
+  describe('selectValue()', () => {
+    it('can set and overwrite single value', () => {
+      let store = new AssistedSearchStore();
+      store.selectValue('hello');
+      expectInput(store, 'hello');
+      expectEntry(store, 0, null, 'hello', 1);
+
+      store.selectValue('abc');
+      expectInput(store, 'abc');
+      expectEntry(store, 0, null, 'abc', 1);
+    });
+
+    it('can set and re-set multi value', () => {
+      let store = new AssistedSearchStore({
+        type: 'multiple'
+      });
+
+      store.selectValue('value1');
+      expectInput(store, '');
+      expectEntry(store, 0, null, 'value1', 1);
+
+      store.selectValue('value2');
+      expectInput(store, '');
+      expectEntry(store, 1, null, 'value2', 2);
+
+    });
+
+    it('can set and re-set faceted value', () => {
+      let store = new AssistedSearchStore({
+        type: 'faceted'
+      }).focus();
+
+      store.selectValue('facet1');
+      expectInput(store, '', 'facet1');
+      store.selectValue('value1');
+      expectInput(store, '', null);
+      expectEntry(store, 0, 'facet1', 'value1', 1);
+
+      store.selectValue('facet2');
+      expectInput(store, '', 'facet2');
+      store.selectValue('value2');
+      expectInput(store, '', null);
+      expectEntry(store, 1, 'facet2', 'value2', 2);
+
+      store.focus(1);
+      store.selectValue('value2-update');
+      expectEntry(store, 1, 'facet2', 'value2-update', 2);
     });
   });
 
@@ -98,14 +148,14 @@ describe('AssistedSearchStore', () => {
 
     it('fires submit events only when selecting facet values', async () => {
       let store = new AssistedSearchStore({
-        type:'faceted',
+        type: 'faceted',
         getFacets: () => ['A', 'B'],
         getValues: () => ['a', 'b']
       });
       store.focus();
 
       let listener = spy();
-      store.addListener(SUBMIT,listener);
+      store.addListener(SUBMIT, listener);
 
       // setting candidate facet
       store.setInput('a');
@@ -122,5 +172,5 @@ describe('AssistedSearchStore', () => {
       store.selectExact(0);
       expect(listener.callCount).eq(1);
     });
-  })
+  });
 });

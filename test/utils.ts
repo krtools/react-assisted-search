@@ -78,6 +78,7 @@ export function expectNoFacet(store: AssistedSearchStore, entry?: number): void 
 export function expectFacet(store: AssistedSearchStore, facet?: string, entry?: number) {
   let input: Input = store.input;
   if (typeof entry === 'number') {
+    expect(store.entries[entry], `entries[${entry}] does not exist`).not.eq(undefined);
     input = store.entries[entry].input;
   }
   if (!facet) {
@@ -109,16 +110,16 @@ export function expectValue(store: AssistedSearchStore, value: string, entry?: n
  * Convenience to check the input and CANDIDATE facet of the active input
  * @param store the store
  * @param value the expected value
- * @param facet the candidate facet value
+ * @param candidateFacet the candidate facet value
  */
-export function expectInput(store: AssistedSearchStore, value: string, facet?: string | null) {
+export function expectInput(store: AssistedSearchStore, value: string, candidateFacet?: string | null) {
   let input = store.input;
   expect(input.value, `expecting input to have value '${value}'`).eq(value);
-  if (facet === null || facet === undefined) {
+  if (candidateFacet === null || candidateFacet === undefined) {
     expectNoFacet(store);
   } else {
     expect(input.facet).not.oneOf([null, undefined]);
-    expect(input.facet.value, `expecting facet to be '${facet}'`).eq(facet);
+    expect(input.facet.value, `expecting facet to be '${candidateFacet}'`).eq(candidateFacet);
   }
 }
 
