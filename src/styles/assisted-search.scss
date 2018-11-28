@@ -15,6 +15,11 @@ $selection-color: #fff;
     top: 100%;
     left: 0;
     position: absolute;
+
+    // todo: bit of a hack here, check children before rendering in react?
+    &:empty {
+      display: none;
+    }
   }
 
   &-dropdown {
