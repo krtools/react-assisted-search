@@ -4,7 +4,7 @@ import {spy} from 'sinon';
 
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
 import {CHANGE, SUBMIT, UPDATE} from '../../src/stores/EventTypes';
-import {expectEntry, expectFacet, expectInput, storeWithChangeHandler} from '../utils';
+import {expectEntry, expectFacet, expectInput, expectNoFacet, storeWithChangeHandler} from '../utils';
 import sleep from '../../src/util/sleep';
 
 describe('AssistedSearchStore', () => {
@@ -144,6 +144,38 @@ describe('AssistedSearchStore', () => {
 
       store.selectExact(0);
       expect(fn.callCount).eq(1);
+    });
+
+    it('fires submit when empty value is given, but no new entry/candidate', () => {
+      let store = new AssistedSearchStore({
+        type: 'faceted'
+      }).focus();
+
+      let listener = spy();
+      store.addListener(SUBMIT, listener);
+      expect(listener.callCount).eq(0);
+
+      store.setInput('');
+      expect(listener.callCount).eq(0);
+
+      store.setSelection(true, true);
+      expectInput(store, '', null);
+      // key check here: it fires a submit event even though nothing changed
+      expect(listener.callCount).eq(1);
+
+      store.selectValue('facet1', true, true);
+      expect(listener.callCount).eq(1);
+
+      store.selectValue('value1', true, true);
+      expect(listener.callCount).eq(2);
+
+      // empty input value
+      store.setSelection(true, true);
+      // no changes to any of the inputs or values
+      expectEntry(store, 0, 'facet1', 'value1', 1);
+      expectInput(store, '', null);
+      // key check here: a submit event gets fired, but nothing else happens/changes
+      expect(listener.callCount).eq(3);
     });
 
     it('fires submit events only when selecting facet values', async () => {

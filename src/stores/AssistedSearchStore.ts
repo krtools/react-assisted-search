@@ -911,10 +911,12 @@ export default class AssistedSearchStore {
   /**
    * Add the facet value, either from the selection or from the input, if applicable, or sets the
    * standalone value determined by isFacet | options.isStandaloneValue()
+   * @returns true if an entry was added as a result (implies we need to submit). If a string, that is the facet candidate set, which
+   * implies we NEVER submit
    * @private
    */
   @action
-  private _setCandidateFacet(input: Input = this.activeElement, selected: DropdownOption, letOverride = true): void | true {
+  private _setCandidateFacet(input: Input = this.activeElement, selected: DropdownOption, letOverride = true): void | true | string {
     let opts = this.options;
     let value: string | Value = input.value;
     // this comes before checking selected items, manually typed in value has precedence
@@ -951,6 +953,7 @@ export default class AssistedSearchStore {
       if (facet) {
         input.facet = facet;
         input.value = '';
+        return facet.value;
       }
     }
   }
@@ -1167,10 +1170,14 @@ export default class AssistedSearchStore {
         this.focus();
       } else {
         if (this.isFaceted() && !this.getActiveFacet()) {
-          if (this._setCandidateFacet(this.activeElement, selected, submit === true)) {
-            this.input.value = '';
-          } else {
+          let candidate = this._setCandidateFacet(this.activeElement, selected, submit === true);
+          if (typeof candidate === 'string') {
+            // we set candidate, suppress submit
             doSubmit = false;
+          }
+          if (candidate) {
+            // when non-undefined, we changed a value, otherwise it means there was nothing to submit
+            this.input.value = '';
           }
         } else {
           this._addValues(selected, submit);
