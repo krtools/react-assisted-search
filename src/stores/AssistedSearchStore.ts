@@ -899,6 +899,10 @@ export default class AssistedSearchStore {
 
   @action
   public clearDropdown(): void {
+    // clear pending to prevent dropdown from popping up again
+    this._currentLookup = null;
+    this._setLoading(false);
+    this._setDropdownError(null);
     Object.assign(this.dropdown, {
       items: [],
       selected: [],
@@ -962,7 +966,7 @@ export default class AssistedSearchStore {
    * @param force set to true to run regardless of if another updateDropdown call is pending
    * @private
    */
-  private updateDropdown(force?: boolean): void {
+  public updateDropdown(force?: boolean): void {
     let ud = this._ud;
     if (!force && ud) {
       return;
