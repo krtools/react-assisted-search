@@ -2,11 +2,13 @@ import * as React from 'react';
 import classnames from 'classnames';
 import AssistedSearchStore from './stores/AssistedSearchStore';
 import {omit} from './util/convertValues';
+import {MouseEvent} from 'react';
 
 export interface ContainerProps {
   children?: any;
   className?: string;
   focused?: boolean;
+  onClick?: (e: MouseEvent<HTMLDivElement>) => any;
   store: AssistedSearchStore;
 
   [key: string]: any;
@@ -31,6 +33,15 @@ export default class Container extends React.Component<ContainerProps> {
     });
   };
 
+  private _click = (e: MouseEvent<HTMLDivElement>) => {
+    if (this.props.store.isFocused() && !this.props.store.showingDropdown()) {
+      this.props.store.updateDropdown();
+    }
+    if (this.props.onClick) {
+      this.props.onClick(e);
+    }
+  };
+
   render() {
     let {children, className, focused, ...props} = omit(this.props, ['store']);
 
@@ -41,6 +52,7 @@ export default class Container extends React.Component<ContainerProps> {
         onBlur={this.onBlur}
         ref={this._setRef}
         {...props}
+        onClick={this._click}
       >
         {children}
       </div>
