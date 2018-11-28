@@ -16,6 +16,7 @@ import {Dropdown, Entry, Input} from './ComponentStores';
 import {action, dropdownAction} from '../decorators/action';
 import {toValue} from '../util/convertValues';
 import {AssistedSearchType} from './AssistedSearchType';
+import {number} from 'prop-types';
 
 type ChangeSet = [string, SearchEntry[]];
 
@@ -528,7 +529,13 @@ export default class AssistedSearchStore {
    */
   @action
   public setSelectedItems(items: number[]) {
-    this.dropdown.selected = items.map(i => this.dropdown.items[i]);
+    this.dropdown.selected = items.map(i => {
+      let item = this.dropdown.items[i];
+      if (item === undefined) {
+        throw new TypeError(`cannot select dropdown item @ index ${i} (not present)`);
+      }
+      return item;
+    });
   }
 
   /**
@@ -549,10 +556,13 @@ export default class AssistedSearchStore {
    * Select the next item in the dropdown, wrapping to the top if necessary.
    */
   @action
-  public selectNextItem(): void {
+  public selectNextItem(offset: number = 1): void {
     let dropdown = this.dropdown;
-    let item = dropdown.selected.length ? dropdown.items.indexOf(dropdown.selected[0]) + 1 : 0;
-    item = item >= dropdown.items.length ? 0 : item;
+    let item = dropdown.items.indexOf(dropdown.selected[0]);
+    if (item === -1 || isNaN(item)) {
+      this.setSelectedItems([0]);
+    }
+    item = item >= (this.dropdown.items.length - 1) ? 0 : Math.min(dropdown.items.length - 1, item + offset);
     this.setSelectedItems([item]);
   }
 
@@ -572,10 +582,13 @@ export default class AssistedSearchStore {
    * Select the previous (above) item in the dropdown, wrapping to the bottom if necessary.
    */
   @action
-  public selectPrevItem() {
+  public selectPrevItem(offset: number = 1) {
     let dropdown = this.dropdown;
     let item = dropdown.items.indexOf(dropdown.selected[0]);
-    item = item <= 0 || isNaN(item) ? dropdown.items.length - 1 : item - 1;
+    if (item === -1 || isNaN(item)) {
+      this.setSelectedItems([this.dropdown.items.length - 1]);
+    }
+    item = item === 0 ? this.dropdown.items.length - 1 : Math.max(item - offset, 0);
     this.setSelectedItems([item]);
   }
 

@@ -6,6 +6,7 @@ import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
 import {UPDATE} from '../../src/stores/EventTypes';
 import sleep from '../../src/util/sleep';
 import {toOptions} from '../../src/util/convertValues';
+import {expectSelected} from '../utils';
 
 describe('Single Mode', () => {
   it('initializes w/ no-arg constructor, defaults to single mode', () => {
@@ -107,40 +108,81 @@ describe('Single Mode', () => {
   describe('arrow up/down', () => {
     let store: AssistedSearchStore;
     before(async () => {
-      store = new AssistedSearchStore();
-      store.dropdown.items = await toOptions(['A', 'B', 'C']);
-      store.focus();
+      store = new AssistedSearchStore({
+        minLength: 0,
+        getValues: () => ['A', 'B', 'C']
+      }).focus();
+      store.setInput('a');
+      await sleep();
     });
 
     it('down arrow to first item', () => {
       store.selectNextItem();
-      expect(store.isSelectedItem(0)).eq(true);
+      expectSelected(store, 0);
     });
 
     it('test next', () => {
       store.selectNextItem();
-      expect(store.isSelectedItem(1)).eq(true);
+      expectSelected(store, 1);
     });
 
     it('test prev to zero', () => {
       store.selectPrevItem();
-      expect(store.isSelectedItem(0)).eq(true);
+      expectSelected(store, 0);
     });
 
     it('test wraps backward', () => {
       store.selectPrevItem();
-      expect(store.isSelectedItem(2)).eq(true);
+      expectSelected(store, 2);
     });
 
     it('test wraps around forward', () => {
+      expectSelected(store, 2);
       store.selectNextItem();
-      expect(store.isSelectedItem(0)).eq(true);
+      expectSelected(store, 0);
     });
 
     it('forward to last item', () => {
       store.selectNextItem();
       store.selectNextItem();
-      expect(store.isSelectedItem(2)).eq(true);
+      expectSelected(store, 2);
+    });
+
+    it('allows offsets down', () => {
+      store.setSelectedItems([0]);
+      expectSelected(store, 0);
+      store.selectNextItem(2);
+      expectSelected(store, 2);
+    });
+
+    it('does not overflow the upper bounds when i + offset > len', () => {
+      store.setSelectedItems([1]);
+      store.selectNextItem(2);
+      expectSelected(store, 2);
+    });
+
+    it('always sticks to top when selectNext + offset rolls over', () => {
+      store.setSelectedItem(2);
+      store.selectNextItem(2);
+      expectSelected(store, 0);
+    });
+
+    it('allows offsets up', () => {
+      store.setSelectedItem(2);
+      store.selectPrevItem(2);
+      expectSelected(store, 0);
+    });
+
+    it('does not violate lower bounds when i - offset < 0', () => {
+      store.setSelectedItem(2);
+      store.selectPrevItem(10);
+      expectSelected(store, 0);
+    });
+
+    it('moving up always sticks to the bottom when rolling over', () => {
+      store.setSelectedItem(0);
+      store.selectPrevItem(2);
+      expectSelected(store, 2);
     });
   });
 });

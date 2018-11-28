@@ -100,20 +100,17 @@ export default class UserEventDispatcher {
 
   /** move up a page (of dropdown items) */
   pageUp = (e: SyntheticEvent<HTMLInputElement>) => {
-    // need: items per "page", size of 1 item (let's say the current item), and the dropdown itself.
-    // TODO: get size of page
+    // TODO: only works right if all dropdown options have the same height, revisit
+    let height = _getHeights(e.currentTarget);
+    this.store.selectPrevItem(Math.floor(height.dropdownHeight / height.itemHeight));
   };
 
   /** move down a page (of dropdown items) */
   pageDown = (e: SyntheticEvent<HTMLInputElement>) => {
-    // TODO: get size of page
+    // TODO: only works right if all dropdown options have the same height, revisit
+    let height = _getHeights(e.currentTarget);
+    this.store.selectNextItem(Math.floor(height.dropdownHeight / height.itemHeight));
   };
-
-  // /** move down (dropdown item) */
-  // shiftUp = (e: SyntheticEvent<HTMLInputElement>) => {};
-
-  // /** move down (dropdown item) */
-  // shiftDown = (e: SyntheticEvent<HTMLInputElement>) => {};
 
   /** move down (dropdown item) */
   up = (e: SyntheticEvent<HTMLInputElement>) => {
@@ -219,4 +216,24 @@ export default class UserEventDispatcher {
    */
   space(): void {
   }
+}
+
+// TODO: this is super hacky, should (A) examine each items height, (B) not use dom selection
+function _getHeights(el: HTMLElement): {dropdownHeight: number, itemHeight: number} {
+  let e = el.closest('.assisted-search');
+  if (!e) {
+    return null;
+  }
+  let dd = el.querySelector('.assisted-search-base-dropdown');
+  if (!dd) {
+    return null;
+  }
+  let item = dd.querySelector('.assisted-search-dropdown-item');
+  if (!item) {
+    return null;
+  }
+  return {
+    dropdownHeight: dd.getBoundingClientRect().height,
+    itemHeight: item.getBoundingClientRect().height
+  };
 }

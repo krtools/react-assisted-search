@@ -192,3 +192,27 @@ export function storeWithChangeHandler(options: AssistedSearchOptions = {}): Ass
   store.focus();
   return store;
 }
+
+/**
+ * Validates the selected items and checks that the items passed in are the only ones selected
+ * @param store
+ * @param items
+ */
+export function expectSelected(store: AssistedSearchStore, items: number | number[]) {
+  let itemsArr = Array.isArray(items) ? items : [items];
+  // basic integrity check
+  store.dropdown.selected.forEach((sel, i) => {
+    expect(sel, `dropdown.selected[${i}] is undefined`).not.eq(undefined);
+  });
+  // iterate through items instead for false positive check
+  store.dropdown.items.forEach((item, i) => {
+    expect(item, `No dropdown items should be undefined (${i})`).not.eq(undefined);
+    expect(store.isSelectedItem(i), `Item ${i} should ${itemsArr.includes(i) ? 'NOT ' : ''}be selected`).eq(
+      itemsArr.includes(i)
+    );
+  });
+  // check for items that are >= the # of items in dropdown
+  itemsArr.forEach(item => {
+    expect(item, `item ${item} is out of range`).lt(store.dropdown.items.length);
+  })
+}
