@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {CSSProperties} from 'react';
 
 export interface VariableWidthDropdownProps {
   style: object;
@@ -25,7 +26,7 @@ export class VariableWidthDropdown extends React.Component<VariableWidthDropdown
       pointerEvents: 'auto',
       flexBasis: 'auto',
       ...style
-    };
+    } as CSSProperties;
     
     return (
       <div style={outerDivStyle}>
