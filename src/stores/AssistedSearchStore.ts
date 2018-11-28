@@ -16,8 +16,6 @@ import {Dropdown, Entry, Input} from './ComponentStores';
 import {action, dropdownAction} from '../decorators/action';
 import {toValue} from '../util/convertValues';
 import {AssistedSearchType} from './AssistedSearchType';
-import {Simulate} from 'react-dom/test-utils';
-import select = Simulate.select;
 
 type ChangeSet = [string, SearchEntry[]];
 
@@ -361,8 +359,10 @@ export default class AssistedSearchStore {
 
   /** Dispatch the update event to any listeners. Note that additional changes will trigger a secondary update event */
   private _update = (): void => {
-    // change _u first in case callback forces another update
+    // change _u and _s first in case callback forces another update
     this._u = false;
+    let submitting = this._s;
+    this._s = false;
     this._dispatch(UPDATE);
 
     // change event only triggers if a value/entry changed
@@ -371,10 +371,9 @@ export default class AssistedSearchStore {
       this._dispatch(CHANGE, value[0], value[1]);
     }
     this._lastValue = value;
-    if (this._s) {
+    if (submitting) {
       this._dispatch(SUBMIT, value[0], value[1]);
     }
-    this._s = false;
   };
 
   /**
