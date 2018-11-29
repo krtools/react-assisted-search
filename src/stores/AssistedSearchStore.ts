@@ -445,7 +445,7 @@ export default class AssistedSearchStore {
   }
 
   /** Returns the current input value */
-  private getActiveInput(): string {
+  public getActiveInput(): string {
     let active = this.activeElement;
     return active ? active.value : null;
   }
