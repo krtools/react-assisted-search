@@ -152,7 +152,7 @@ export default class UserEventDispatcher {
    */
   tab = (e: SyntheticEvent<HTMLInputElement>) => {
     let store = this.store;
-    if (store.hasSelectedItems() || store.activeElement && store.activeElement.value) {
+    if (store.hasSelectedItems() || (store.activeElement && store.activeElement.value)) {
       store.setSelection(store.isSingle(), false);
       e.preventDefault();
     }
@@ -214,12 +214,11 @@ export default class UserEventDispatcher {
   /**
    * Toggle the selected status of the highlighted item in the dropdown
    */
-  space(): void {
-  }
+  space(): void {}
 }
 
 // TODO: this is super hacky, should (A) examine each items height, (B) not use dom selection
-function _getHeights(el: HTMLElement): {dropdownHeight: number, itemHeight: number} {
+function _getHeights(el: HTMLElement): {dropdownHeight: number; itemHeight: number} {
   let e = el.closest('.assisted-search');
   if (!e) {
     return null;

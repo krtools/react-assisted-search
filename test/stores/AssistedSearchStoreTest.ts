@@ -47,7 +47,6 @@ describe('AssistedSearchStore', () => {
       store.selectValue('value2');
       expectInput(store, '');
       expectEntry(store, 1, null, 'value2', 2);
-
     });
 
     it('can set and re-set faceted value', () => {
@@ -122,7 +121,6 @@ describe('AssistedSearchStore', () => {
       expectEntry(store, 0, 'A', 'a', 1);
     });
   });
-
 
   describe('onSubmit', () => {
     it('fires when selecting a single value', async () => {

@@ -562,7 +562,7 @@ export default class AssistedSearchStore {
     if (item === -1 || isNaN(item)) {
       this.setSelectedItems([0]);
     }
-    item = item >= (this.dropdown.items.length - 1) ? 0 : Math.min(dropdown.items.length - 1, item + offset);
+    item = item >= this.dropdown.items.length - 1 ? 0 : Math.min(dropdown.items.length - 1, item + offset);
     this.setSelectedItems([item]);
   }
 
@@ -771,7 +771,7 @@ export default class AssistedSearchStore {
       dropdown.error ||
       (dropdown.loadingDropdown !== undefined && dropdown.loadingDropdown !== null) ||
       (dropdown.items &&
-        dropdown.items.length > 0 && //
+      dropdown.items.length > 0 && //
         // min length requirement (won't search either)
         input.value.length >= this.minLength())
     ); //
@@ -932,7 +932,11 @@ export default class AssistedSearchStore {
    * @private
    */
   @action
-  private _setCandidateFacet(input: Input = this.activeElement, selected: DropdownOption, letOverride = true): void | true | string {
+  private _setCandidateFacet(
+    input: Input = this.activeElement,
+    selected: DropdownOption,
+    letOverride = true
+  ): void | true | string {
     let opts = this.options;
     let value: string | Value = input.value;
     // this comes before checking selected items, manually typed in value has precedence

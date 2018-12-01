@@ -117,11 +117,9 @@ describe('AssistedSearchOptions', () => {
       expect(store.input.value).eq('a');
     });
 
-    it('allow custom values passing test function', () => {
-    });
+    it('allow custom values passing test function', () => {});
 
-    it('disallow custom values failing test function', () => {
-    });
+    it('disallow custom values failing test function', () => {});
   });
 
   describe('options.rewriteValue', () => {
@@ -159,7 +157,6 @@ describe('AssistedSearchOptions', () => {
         expectValue(store, 'abc', 0);
       });
     });
-
   });
 
   describe('options.minLength', () => {

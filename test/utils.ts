@@ -52,7 +52,7 @@ export function expectDropdown(store: AssistedSearchStore, selected?: number | n
   expect(store.dropdown.items.length, `Dropdown should have items in it`).greaterThan(0);
   if (typeof selected === 'number' || Array.isArray(selected)) {
     if (Array.isArray(selected) && selected.length === 0) {
-      expect(store.dropdown.selected, 'Dropdown shouldn\'t have items').lengthOf(0);
+      expect(store.dropdown.selected, "Dropdown shouldn't have items").lengthOf(0);
     }
     (Array.isArray(selected) ? selected : [selected]).forEach(i => {
       expect(store.isSelectedItem(i), `${i} should be selected`).eq(true);
@@ -214,5 +214,5 @@ export function expectSelected(store: AssistedSearchStore, items: number | numbe
   // check for items that are >= the # of items in dropdown
   itemsArr.forEach(item => {
     expect(item, `item ${item} is out of range`).lt(store.dropdown.items.length);
-  })
+  });
 }
