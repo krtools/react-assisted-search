@@ -100,6 +100,10 @@ export interface AssistedSearchOptions {
 
   /**
    * Use a custom dropdown, potentially for both getFacets and getValues
+   *
+   * Return null/undefined to allow default behavior
+   * Return false to render nothing
+   * Return anything to render that
    */
   getDropdown?: GetDropdown;
 

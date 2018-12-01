@@ -12,16 +12,18 @@ import sleep from '../../src/util/sleep';
 import {AssistedSearch, FullWidthDropdown} from '../../src';
 import {Simulate} from 'react-dom/test-utils';
 import drop = Simulate.drop;
+import MenuItem from '../../src/MenuItem';
+import {DropdownWrapper} from '../../src/DropdownItems';
 
 describe('<SingleValue>', () => {
   it('value in store matches initial prop value', () => {
-    let el = mount(<SingleValue value="abc"/>);
+    let el = mount(<SingleValue value="abc" />);
     let store: AssistedSearchStore = el.instance()['_store'];
     expect(store.input.value).eq('abc');
   });
 
   it('value in input DOM node matches store value', () => {
-    let el = mount(<SingleValue value="abc"/>);
+    let el = mount(<SingleValue value="abc" />);
     let input = el.find('input').getDOMNode() as HTMLInputElement;
     expect(input.value).eq('abc');
     expectStoreSynced(el);
@@ -33,7 +35,7 @@ describe('<SingleValue>', () => {
     let store: AssistedSearchStore;
 
     before(() => {
-      el = mount(<SingleValue value="" onChange={fn}/>);
+      el = mount(<SingleValue value="" onChange={fn} />);
       store = el.instance()['_store'];
     });
 
@@ -82,7 +84,7 @@ describe('<SingleValue>', () => {
 
   describe('dom props', () => {
     it('passes className and style to top component', () => {
-      let el = mount(<SingleValue className="hello" style={{color: 'red'}}/>);
+      let el = mount(<SingleValue className="hello" style={{color: 'red'}} />);
       let div = el.find('.assisted-search').getDOMNode() as HTMLDivElement;
 
       expect(div).not.eq(undefined);
@@ -92,18 +94,43 @@ describe('<SingleValue>', () => {
   });
 
   describe('options.getDropdown', () => {
+    it('null indicates default behavior', async () => {
+      let getDropdown = spy(() => null);
+      let store = new AssistedSearchStore({
+        getDropdown: getDropdown,
+        getValues: () => ['A', 'B']
+      }).focus();
+      store.setInput('a');
+      await sleep();
+      expectDropdown(store);
+
+      let el = mount(<SingleValue store={store} />);
+      expect(el.find(MenuItem)).lengthOf(2);
+      expect(el.find(DropdownWrapper)).lengthOf(1);
+    });
+
+    it('false indicates do not render', async () => {
+      let getDropdown = spy(() => false);
+      let store = new AssistedSearchStore({
+        getDropdown: getDropdown,
+        getValues: () => ['A', 'B']
+      }).focus();
+      store.setInput('a');
+      await sleep();
+      expectDropdown(store);
+
+      let el = mount(<SingleValue store={store} />);
+      expect(el.find(MenuItem)).lengthOf(0);
+    });
+
     it('returns custom dropdown in place of items', async () => {
-      let getDropdown = spy(() => (
-        <FullWidthDropdown>
-          content
-        </FullWidthDropdown>
-      ));
+      let getDropdown = spy(() => <FullWidthDropdown>content</FullWidthDropdown>);
 
       let store = new AssistedSearchStore({
         getValues: () => ['A', 'B'],
         getDropdown: getDropdown
       });
-      let el = mount(<SingleValue store={store}/>);
+      let el = mount(<SingleValue store={store} />);
 
       store.focus();
       store.setInput('a');

@@ -15,6 +15,19 @@ export class DropdownWrapper extends React.Component<DropdownItemsProps> {
     let store = this.props.store;
     let dropdown = store.dropdown;
 
+    // custom dropdown always takes precedence
+    if (dropdown.content) {
+      let content = dropdown.content();
+      // false indicates to not render anything
+      if (content === false) {
+        return null;
+      }
+      // null/undefined means allow default behavior as if getDropdown is not present
+      if (content != null) {
+        return content;
+      }
+    }
+
     // should we show the loading indicator?
     let loadingDropdown = dropdown.loadingDropdown;
     if (loadingDropdown) {
@@ -28,9 +41,6 @@ export class DropdownWrapper extends React.Component<DropdownItemsProps> {
       return dropdown.error;
     }
 
-    if (dropdown.content) {
-      return dropdown.content();
-    }
     if (dropdown.items && dropdown.items.length) {
       return (
         <FullWidthDropdown>
