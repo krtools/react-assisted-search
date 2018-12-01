@@ -38,13 +38,23 @@ export function actionMethod(target: AssistedSearchStore, descriptor: PropertyDe
 }
 
 export function actionProperty(target: AssistedSearchStore, propertyKey: string, dropdown?: boolean) {
-  let method = (target as any)[propertyKey];
   Object.defineProperty(target, propertyKey, {
-    get: function() {
-      return (...args: any[]) => target.runInAction.call(this, () => method.apply(this, args), dropdown);
+    configurable: true,
+    enumerable: false,
+    get() {
+      return undefined;
     },
-    set: value => {
-      method = value;
+    set(value) {
+      Object.defineProperty(this, propertyKey, {
+        value: function(...args) {
+          (this as AssistedSearchStore).runInAction(() => {
+            value.apply(this, args);
+          }, dropdown);
+        },
+        enumerable: false,
+        writable: true,
+        configurable: true
+      });
     }
   });
 }
