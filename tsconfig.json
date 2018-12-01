@@ -15,16 +15,7 @@
     "skipLibCheck": true,
     "outDir": "es",
     "jsx": "react",
-    "sourceMap": true,
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "baseUrl": ".",
-    "paths": {
-      "lodash/*": [
-        "node_modules/@types/lodash-es/*"
-      ]
-    }
+    "sourceMap": true
   },
   "files": [
     "src/index.ts"
