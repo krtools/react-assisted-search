@@ -5,7 +5,7 @@
  * @param args
  * @param ignoreErrors
  */
-export function invokeAll(functions: Function[], args: any[], ignoreErrors = true) {
+export function invokeAll(functions: Array<Function | null | undefined>, args: any[], ignoreErrors = true) {
   if (Array.isArray(functions)) {
     for (let i = 0; i < functions.length; i++) {
       let fn = functions[i];
@@ -23,11 +23,10 @@ export function invokeAll(functions: Function[], args: any[], ignoreErrors = tru
 }
 
 /**
- *
  * @param getFunction
  */
 export function delegate(getFunction: () => any): any {
-  return function() {
+  return function(this: any) {
     let fn = getFunction();
     if (fn) {
       fn.apply(this, arguments);

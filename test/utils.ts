@@ -3,14 +3,25 @@ import {expect} from 'chai';
 import {Input} from '../src/stores/ComponentStores';
 import {ReactWrapper} from 'enzyme';
 import {SinonSpy} from 'sinon';
-import {SearchEntry, AssistedSearchOptions} from '../src/types';
+import {SearchEntry, AssistedSearchOptions, Facet} from '../src/types';
 import {CHANGE} from '../src/stores/EventTypes';
+
+const NU = [null, undefined];
+
+/**
+ * Convenience to make sure a value is not null/undefined
+ * @param value
+ * @param message
+ */
+export function expectNotNil(value: any, message: string): void {
+  expect(value, message).not.oneOf(NU);
+}
 
 /** Convenience to validate an entry's values in a store in a test */
 export function expectEntry(
   store: AssistedSearchStore,
   idx: number,
-  facet: string,
+  facet: string | null,
   value: string,
   length?: number
 ): void {
@@ -21,9 +32,9 @@ export function expectEntry(
   let entry = store.entries[idx];
   expect(entry, 'entry missing?').not.eq(undefined);
   if (facet === null || facet === undefined) {
-    expect(entry.entry.facet, 'expecting standalone value').oneOf([null, undefined]);
+    expect(entry.entry.facet, 'expecting standalone value').oneOf(NU);
   } else {
-    expect(entry.entry.facet, `entries[${idx}] should have facet`).not.oneOf([null, undefined]);
+    expect(entry.entry.facet, `entries[${idx}] should have facet`).not.oneOf(NU);
     if (entry.entry.facet) {
       expect(entry.entry.facet.value, `facet should match '${facet}'`).eq(facet);
     }
@@ -60,13 +71,24 @@ export function expectDropdown(store: AssistedSearchStore, selected?: number | n
   }
 }
 
+export function expectFacetName(store: AssistedSearchStore, name: string, entry?: number): void {
+  let facet!: Facet;
+  if (typeof entry !== 'number') {
+    let active = store.getActiveEntry()!;
+    expectNotNil(active, `no index given, there must be an active entry`);
+    facet = active.entry.facet!;
+    expect(facet, 'facet must exist').not.eq(null);
+  }
+  expect(facet.value).eq('a');
+}
+
 /**
  * Convenience to expect an input to not have a facet candidate
  * @param store
  * @param entry
  */
-export function expectNoFacet(store: AssistedSearchStore, entry?: number): void {
-  expectFacet(store, null, entry);
+export function expectNoFacetCandidate(store: AssistedSearchStore, entry?: number): void {
+  expectFacetCandidate(store, null, entry);
 }
 
 /**
@@ -75,14 +97,14 @@ export function expectNoFacet(store: AssistedSearchStore, entry?: number): void 
  * @param facet
  * @param entry - if not given, assumes main input
  */
-export function expectFacet(store: AssistedSearchStore, facet?: string, entry?: number) {
+export function expectFacetCandidate(store: AssistedSearchStore, facet?: string | null, entry?: number) {
   let input: Input = store.input;
   if (typeof entry === 'number') {
     expect(store.entries[entry], `entries[${entry}] does not exist`).not.eq(undefined);
     input = store.entries[entry].input;
   }
   if (!facet) {
-    expect(input.facet, `entries[${entry}] should have no facet candidate`).oneOf([null, undefined]);
+    expect(input.facet, `entries[${entry}] should have no facet candidate`).oneOf(NU);
   } else {
     expect(input.facet && input.facet.value).eq(facet);
   }
@@ -116,10 +138,10 @@ export function expectInput(store: AssistedSearchStore, value: string, candidate
   let input = store.input;
   expect(input.value, `expecting input to have value '${value}'`).eq(value);
   if (candidateFacet === null || candidateFacet === undefined) {
-    expectNoFacet(store);
+    expectNoFacetCandidate(store);
   } else {
-    expect(input.facet).not.oneOf([null, undefined]);
-    expect(input.facet.value, `expecting facet to be '${candidateFacet}'`).eq(candidateFacet);
+    expect(input.facet).not.oneOf(NU);
+    expect(input.facet!.value, `expecting facet to be '${candidateFacet}'`).eq(candidateFacet);
   }
 }
 
@@ -128,24 +150,27 @@ export function expectInput(store: AssistedSearchStore, value: string, candidate
  * @param el
  */
 export function expectStoreSynced(el: ReactWrapper) {
-  let store: AssistedSearchStore = el.instance()['_store'];
+  let store = getStore(el);
 
-  expect(store, 'store should be on component as _store').instanceOf(AssistedSearchStore);
   let inputs = el.find('input').map(e => e.getDOMNode() as HTMLInputElement);
-  let entries = el.find('.assisted-search-entry').map(e => e.getDOMNode() as HTMLDivElement);
+  let domEntries = el.find('.assisted-search-entry').map(e => e.getDOMNode() as HTMLDivElement);
 
   if (store.isSingle()) {
     expect(inputs.length, 'single type should only ever have 1 input').eq(1);
-    expect(entries.length, 'single type should never have DOM representations of entries').eq(0);
+    expect(domEntries.length, 'single type should never have DOM representations of entries').eq(0);
   } else {
     expect(inputs.length, `# dom inputs should match input+entries (1+${store.entries.length})`).eq(
       store.entries.length + 1
     );
-    expect(entries.length, '# dom entries should match store entries').eq(store.entries.length);
-    for (let i = 0; i < entries.length; i++) {
-      let facet = entries[i].querySelector('.assisted-search-entry-facet');
+    expect(domEntries.length, '# dom entries should match store entries').eq(store.entries.length);
+    for (let i = 0; i < domEntries.length; i++) {
+      let facet = domEntries[i].querySelector('.assisted-search-entry-facet')!;
+      expect(facet, 'bad querySelector? dom facet must exist').not.oneOf(NU);
+
       if (store.isFaceted()) {
-        expect(facet.textContent, `facet name should match on entries[${i}]`).eq(store.entries[i].entry.facet.value);
+        let storeFacet = store.entries[i].entry.facet!;
+        expect(storeFacet, `expecting an entry facet @ index ${i}`).not.oneOf(NU);
+        expect(facet.textContent, `facet name should match on entries[${i}]`).eq(storeFacet.value);
       } else {
         expect(facet).eq(undefined);
       }
@@ -160,7 +185,6 @@ export function expectStoreSynced(el: ReactWrapper) {
  * @param entry
  */
 export function expectFocus(store: AssistedSearchStore, entry: number = -1) {
-  let idx = store.getActiveEntryIdx();
   expect(store.getActiveEntryIdx(), `active entry should be ${entry === -1 ? 'main input' : entry}`).eq(entry);
 }
 
@@ -215,4 +239,35 @@ export function expectSelected(store: AssistedSearchStore, items: number | numbe
   itemsArr.forEach(item => {
     expect(item, `item ${item} is out of range`).lt(store.dropdown.items.length);
   });
+}
+
+/**
+ * Convenience to expect the selectionStart and selectionEnd to match the values given at the entry given
+ * @param store
+ * @param start
+ * @param end
+ * @param entry
+ */
+export function expectCursor(store: AssistedSearchStore, start: number, end: number, entry: number | null): void {
+  let input = requireInput(store, entry);
+  expect(input.selectionEnd).eq(end);
+  expect(input.selectionStart).eq(start);
+}
+
+/**
+ * Convenience to verify the input's existence with proper error messaging
+ * @param store
+ * @param entry
+ */
+function requireInput(store: AssistedSearchStore, entry: number | null): Input {
+  let input = entry === null ? store.input : store.entries[entry] && store.entries[entry].input;
+  expect(input, `expecting ${entry === null ? 'main input' : `entries[${entry}] to exist`}`).not.oneOf(NU);
+
+  return input;
+}
+
+export function getStore(el: ReactWrapper): AssistedSearchStore {
+  let store: AssistedSearchStore = (el.instance() as any)['_store'] as AssistedSearchStore;
+  expect(store, 'expecting el._store to have the store').instanceOf(AssistedSearchStore);
+  return store;
 }

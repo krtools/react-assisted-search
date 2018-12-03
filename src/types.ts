@@ -105,7 +105,7 @@ export interface AssistedSearchOptions {
    * Return false to render nothing
    * Return anything to render that
    */
-  getDropdown?: GetDropdown;
+  getDropdown?: Nullable<GetDropdown>;
 
   /**
    * A placeholder value for the assisted search. If a string, it will only display when the component has nothing in
@@ -122,7 +122,7 @@ export interface AssistedSearchOptions {
    * @deprecated use getEntry instead
    * @param input
    */
-  isStandaloneValue?: (input: string) => boolean;
+  isStandaloneValue?: Nullable<(input: string) => boolean>;
 
   /**
    * An optional hook for implementers to programmatically override the entry value to be set from the point of facet
@@ -134,7 +134,7 @@ export interface AssistedSearchOptions {
    * @param facet the current facet, null if we're setting a facet, or we're in multiple/single mode
    * @param store the store
    */
-  overrideEntry?: (input: Value, facet: Facet, store: AssistedSearchStore) => SearchEntry | null | undefined;
+  overrideEntry?: (input: Value, facet: Nullable<Facet>, store: AssistedSearchStore) => SearchEntry | null | undefined;
 
   /**
    * Use this to programmatically rewrite any facet submitted to the component from the user
@@ -144,10 +144,10 @@ export interface AssistedSearchOptions {
   /**
    * Use this to programmatically rewrite any value submitted to the component
    */
-  rewriteValue?: RewriteValue;
+  rewriteValue?: Nullable<RewriteValue>;
 
   /** Use this to override the default dropdown item template. If the function returns null/undefined, the default will be used. */
-  optionTemplate?: OptionTemplate;
+  optionTemplate?: Nullable<OptionTemplate>;
 }
 
 /** Function to return a completely custom dropdown */
@@ -157,12 +157,12 @@ export interface GetDropdown {
 
 /** Function to return custom content for a dropdown item */
 export interface OptionTemplate {
-  (item: DropdownOption, facet: Facet, store: AssistedSearchStore): any;
+  (item: DropdownOption, facet: Facet | null, store: AssistedSearchStore): any;
 }
 
 /** Function to return the minlength of an input based on context */
 export interface GetMinLength {
-  (input: string, facet: string, store: AssistedSearchStore): number;
+  (input: string, facet: Nullable<string>, store: AssistedSearchStore): number;
 }
 
 /**
@@ -179,14 +179,14 @@ export interface IsAutoSelectFirst {
 
 /** Rewrites a value before committing it */
 export interface RewriteValue {
-  (input: Value, facet: Facet, store: AssistedSearchStore): string | Value;
+  (input: Value, facet: Nullable<Facet>, store: AssistedSearchStore): string | Value;
 }
 
 /**
  * Function to return the placeholder based on the current state of the component.
  */
 export interface GetPlaceholder {
-  (field: string, store: AssistedSearchStore): string;
+  (field: string | null, store: AssistedSearchStore): string;
 }
 
 export type ValidFacet = Facet | string;
@@ -229,7 +229,7 @@ export type ValidDropdownOption = string | DropdownOption;
  * A value selected by the user.
  */
 export interface SearchEntry {
-  facet?: Facet;
+  facet?: Nullable<Facet>;
 
   /** Defaults to ":" */
   operator?: string;
@@ -316,3 +316,6 @@ export interface InitialValues {
    */
   entries?: Array<string | Value | SearchEntry>;
 }
+
+/** Type to indicate a value can be null, undefined or some other type */
+export type Nullable<T> = T | null | undefined;

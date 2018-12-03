@@ -1,5 +1,5 @@
 // Event.key is not consistent cross-browser
-import {SyntheticEvent} from 'react';
+import {KeyboardEvent} from 'react';
 
 const KEYS = {
   8: 'Backspace',
@@ -26,8 +26,8 @@ const KEYS = {
 };
 
 export type GetKeyHandlerMap = () => {
-  test?: (e: SyntheticEvent<HTMLInputElement>) => void;
-  [key: string]: (e: SyntheticEvent<HTMLInputElement>) => void;
+  test?: (e: KeyboardEvent<HTMLInputElement>) => any;
+  [key: string]: ((e: KeyboardEvent<HTMLInputElement>) => any) | undefined;
 };
 
 /**
@@ -40,7 +40,7 @@ export type GetKeyHandlerMap = () => {
  */
 export default function keyHandler(getMap: GetKeyHandlerMap, after?: Function) {
   /** @param {KeyboardEvent} e */
-  return function(e: any) {
+  return function(this: any, e: any) {
     let map = getMap();
 
     let test = map.test;
@@ -66,7 +66,7 @@ export default function keyHandler(getMap: GetKeyHandlerMap, after?: Function) {
       keys.push(KEYS[e.which]);
     }
 
-    let fn: Function;
+    let fn: Function | undefined;
     if (!keys.length && map.other) {
       fn = map.other;
     } else {

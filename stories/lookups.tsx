@@ -1,8 +1,9 @@
 import * as React from 'react';
 
-import {orderBy, get} from 'lodash';
-
+import {get, orderBy} from 'lodash';
+// @ts-ignore
 import countryList from 'country-list';
+// @ts-ignore
 import us from 'us';
 import sleep from '../src/util/sleep';
 import USMapDropdown from './dropdowns/USMap/USMapDropdown';
@@ -36,7 +37,7 @@ export interface Country {
 
 function findCountries(value: string): Country[] {
   let q = value.toLowerCase().trim();
-  let countrys = countries.getData().filter(country => {
+  let countrys = countries.getData().filter((country: Country) => {
     return country.name.toLowerCase().includes(q) || country.code.toLowerCase().includes(q);
   });
 
@@ -61,6 +62,8 @@ export async function lookupStates(value: string): Promise<Array<Value>> {
 export interface State {
   name: string;
   abbr: string;
+  metadata: any;
+  value: string;
 }
 
 /**
@@ -70,7 +73,7 @@ export interface State {
  */
 export function findStates(value: string): State[] {
   let q = value.toLowerCase().trim();
-  let states = us.STATES.filter(state => {
+  let states = us.STATES.filter((state: State) => {
     return state.name.toLowerCase().includes(q) || state.abbr.toLowerCase().includes(q);
   });
 
@@ -112,11 +115,11 @@ export function numMatchingFirstChars(value1: string, value2: string): number {
       return i;
     }
   }
+  return 0;
 }
 
 export const COUNTRY = 'country';
 export const STATE = 'state';
-export const DATE = 'date';
 
 /**
  * Get filtered facet list
@@ -124,7 +127,7 @@ export const DATE = 'date';
  * @param {string} value
  * @returns {Object[]}
  */
-export async function getFacets(value) {
+export async function getFacets(value: string): Promise<Value[]> {
   await sleep(LOOKUP_DELAY);
   let filtered = [COUNTRY, STATE]
     .filter(s => {
@@ -143,7 +146,7 @@ export async function getFacets(value) {
  * @param facet
  * @returns {Promise<Array>}
  */
-export async function getValues(value: string, facet: string) {
+export async function getValues(value: string, facet?: string | null): Promise<Value[]> {
   // this function being async is overkill, but here to emphasize that getValues must return a promise.
   switch (facet) {
     case COUNTRY:
@@ -160,7 +163,7 @@ export async function getValues(value: string, facet: string) {
  * @param {string} q
  * @returns {Promise<any[]>}
  */
-export async function lookupWithStateCodes(q) {
+export async function lookupWithStateCodes(q: string): Promise<DropdownOption[]> {
   let states = findStates(q);
   return states.map(state => {
     return {
@@ -177,7 +180,7 @@ export async function lookupWithStateCodes(q) {
  * @param facet
  * @param store
  */
-export function getDropdown(items: DropdownOption[], input: string, facet: Facet, store: AssistedSearchStore) {
+export function getDropdown(items: DropdownOption[], input: string, facet: Facet | null, store: AssistedSearchStore) {
   if (!facet) {
     return null;
   }

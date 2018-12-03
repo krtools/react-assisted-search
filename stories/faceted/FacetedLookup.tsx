@@ -5,15 +5,14 @@ import AssistedSearch from '../../src/AssistedSearch';
 import '../../src/styles/assisted-search.scss';
 import '../../src/styles/assisted-search-bootstrap3.scss';
 
-
 import {getValues, getFacets, getDropdown} from '../lookups';
-import {AllowCustomValue, RewriteValue, AssistedSearchOptions} from '../../src/types';
+import {AllowCustomValue, RewriteValue, AssistedSearchOptions, Value} from '../../src/types';
 
 export interface FacetedLookupProps {
-  customValues: AllowCustomValue,
-  customDropdown: null,
-  rewriteValue?: RewriteValue,
-  standalone?: boolean
+  customValues: AllowCustomValue;
+  customDropdown: null;
+  rewriteValue?: RewriteValue;
+  standalone?: boolean;
 }
 
 /**
@@ -37,9 +36,9 @@ export default class FacetedLookup extends React.Component<FacetedLookupProps> {
       placeholder: 'Placeholder'
     };
 
-    return <AssistedSearch options={options}/>;
+    return <AssistedSearch options={options} />;
   }
 }
 
-const isFilter = val => /^filter:|^#\S+/.test(val);
-const rewriteInput = input => input + '-rewrite';
+const isFilter = (val: string) => /^filter:|^#\S+/.test(val);
+const rewriteInput = (value: Value) => value.value + '-rewrite';

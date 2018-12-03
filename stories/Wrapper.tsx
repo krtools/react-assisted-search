@@ -8,11 +8,11 @@ export interface WrapperState {
 
 export default class Wrapper extends React.Component<any, WrapperState> {
   state: WrapperState = {};
-  
+
   componentDidCatch(error: Error, info: ErrorInfo) {
     this.setState({error, info});
   }
-  
+
   render() {
     if (this.state.error) {
       return (
@@ -24,7 +24,7 @@ export default class Wrapper extends React.Component<any, WrapperState> {
           <br/>
           <br/>
           <span style={{whiteSpace: 'pre-wrap', fontFamily: 'monospace'}}>
-            {this.state.info.componentStack}
+            {this.state.info!.componentStack}
           </span>
         </div>
       );

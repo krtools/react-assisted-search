@@ -21,7 +21,7 @@ export interface SingleValueExampleState {
 export default class SingleValueExample extends React.Component<any, SingleValueExampleState> {
   state: SingleValueExampleState = {};
 
-  changeValue = (value, entries, store: AssistedSearchStore) => {
+  changeValue = (value: string, entries: SearchEntry[], store: AssistedSearchStore) => {
     this.setState({
       value: value,
       input: store.input.value,
@@ -30,7 +30,7 @@ export default class SingleValueExample extends React.Component<any, SingleValue
     });
   };
 
-  async getStates(query) {
+  async getStates(query: string) {
     let results = await lookupStates(query);
     return results.map(r => ({
       value: r.value

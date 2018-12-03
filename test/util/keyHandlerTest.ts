@@ -36,7 +36,7 @@ describe('KeyHandler', () => {
   });
 });
 
-function testKey(str?, which?, ctrlKey?, altKey?, shiftKey?, opts?) {
+function testKey(str: string, which?: number, ctrlKey?: boolean, altKey?: boolean, shiftKey?: boolean, opts?: any) {
   let fn = spy();
   let handler = keyHandler(() => {
     return {

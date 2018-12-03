@@ -102,14 +102,18 @@ export default class UserEventDispatcher {
   pageUp = (e: SyntheticEvent<HTMLInputElement>) => {
     // TODO: only works right if all dropdown options have the same height, revisit
     let height = _getHeights(e.currentTarget);
-    this.store.selectPrevItem(Math.floor(height.dropdownHeight / height.itemHeight));
+    if (height) {
+      this.store.selectPrevItem(Math.floor(height.dropdownHeight / height.itemHeight));
+    }
   };
 
   /** move down a page (of dropdown items) */
   pageDown = (e: SyntheticEvent<HTMLInputElement>) => {
     // TODO: only works right if all dropdown options have the same height, revisit
     let height = _getHeights(e.currentTarget);
-    this.store.selectNextItem(Math.floor(height.dropdownHeight / height.itemHeight));
+    if (height) {
+      this.store.selectNextItem(Math.floor(height.dropdownHeight / height.itemHeight));
+    }
   };
 
   /** move down (dropdown item) */
@@ -218,7 +222,7 @@ export default class UserEventDispatcher {
 }
 
 // TODO: this is super hacky, should (A) examine each items height, (B) not use dom selection
-function _getHeights(el: HTMLElement): {dropdownHeight: number; itemHeight: number} {
+function _getHeights(el: HTMLElement): {dropdownHeight: number; itemHeight: number} | null {
   let e = el.closest('.assisted-search');
   if (!e) {
     return null;

@@ -5,7 +5,6 @@ import {spy} from 'sinon';
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
 import {UPDATE} from '../../src/stores/EventTypes';
 import sleep from '../../src/util/sleep';
-import {toOptions} from '../../src/util/convertValues';
 import {expectSelected} from '../utils';
 
 describe('Single Mode', () => {

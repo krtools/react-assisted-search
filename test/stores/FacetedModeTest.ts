@@ -2,7 +2,14 @@ import 'mocha';
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
 import {expect} from 'chai';
 import sleep from '../../src/util/sleep';
-import {expectDropdown, expectEntry, expectFacet, expectInput, expectNoFacet, expectValue} from '../utils';
+import {
+  expectDropdown,
+  expectEntry,
+  expectFacetCandidate,
+  expectInput,
+  expectNoFacetCandidate,
+  expectValue
+} from '../utils';
 import {createPartial, toEntry, toValue} from '../../src/util/convertValues';
 
 describe('Faceted Mode', () => {
@@ -53,12 +60,12 @@ describe('Faceted Mode', () => {
       expect(store.input.value, 'input value should be cleared').eq('');
       expect(store.entries, 'no entries yet').lengthOf(0);
       expect(store.isActiveEntry(), 'main input is focused').eq(true);
-      expect(store.input.facet.value, 'facet candidate properly set to dropdown value').eq('A');
+      expectFacetCandidate(store, 'A');
     });
 
     it('(2) cancelling facet candidate updates dropdown', () => {
       store.setInputSelection(0, 0);
-      expect(store.input.facet.value, 'precondition').eq('A');
+      expectFacetCandidate(store, 'A');
       expect(store.deleteBehind(), 'tells to preventDefault()').eq(true);
       expect(store.input.facet, 'candidate facet should be removed now').eq(null);
       expect(store.input.value, 'main input still empty').eq('');
@@ -69,8 +76,7 @@ describe('Faceted Mode', () => {
       await sleep();
       expect(store.dropdown.items).lengthOf(2);
       store.selectExact([0]);
-      expect(store.input.facet.value).eq('A');
-      expect(store.input.facet).not.eq(null);
+      expectFacetCandidate(store, 'A');
       store.setInput('a');
       await sleep();
       store.selectExact([0]);
@@ -116,11 +122,11 @@ describe('Faceted Mode', () => {
     });
 
     it('(2) sets a standalone value with no facet', () => {
-      expect(store.activeElement.facet).eq(null);
+      expectNoFacetCandidate(store);
       store.setInput('a:b');
       store.setSelection();
       expect(store.input.value, 'input value should be cleared').eq('');
-      expect(store.activeElement.facet, 'no facet selected here').eq(null);
+      expectNoFacetCandidate(store);
       expectEntry(store, 1, null, 'a:b', 2);
     });
 
@@ -162,7 +168,7 @@ describe('Faceted Mode', () => {
       // triggers facet values
       expect(store.isActiveEntry(0));
       expectValue(store, '', 0);
-      expectFacet(store, 'A', 0);
+      expectFacetCandidate(store, 'A', 0);
 
       await sleep();
       store.selectExact(0);
@@ -187,7 +193,7 @@ describe('Faceted Mode', () => {
       expectDropdown(store);
       store.selectExact(1);
       expect(store.input.value).eq('');
-      expectNoFacet(store);
+      expectNoFacetCandidate(store);
       expectEntry(store, 0, null, 'a:b', 1);
     });
 
@@ -237,11 +243,11 @@ describe('Faceted Mode', () => {
       store.setInput('a');
       await sleep();
       store.selectExact(0);
-      expectNoFacet(store);
+      expectNoFacetCandidate(store);
       expectValue(store, 'a x');
 
       store.setSelection();
-      expectFacet(store, 'a x');
+      expectFacetCandidate(store, 'a x');
     });
   });
 
@@ -256,7 +262,7 @@ describe('Faceted Mode', () => {
       store.setSelection(true);
 
       expect(store.input.facet).not.eq(undefined);
-      expect(store.input.facet.value).eq('facet_rewrite');
+      expectFacetCandidate(store, 'facet_rewrite');
     });
   });
 
@@ -281,7 +287,7 @@ describe('Faceted Mode', () => {
 
       store.setInput('f1');
       store.setSelection();
-      expectFacet(store, 'f1');
+      expectFacetCandidate(store, 'f1');
       store.setInput('hello');
       store.setSelection();
       expectEntry(store, 0, 'f1', 'val');
@@ -313,7 +319,7 @@ describe('Faceted Mode', () => {
       store.setInput('a');
       await sleep();
       store.selectExact(0);
-      expectFacet(store, 'A');
+      expectFacetCandidate(store, 'A');
 
       store.setInput('b');
       await sleep();

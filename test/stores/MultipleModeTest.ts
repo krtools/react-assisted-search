@@ -3,7 +3,7 @@ import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
 import {createPartial, toEntries, toFacetValue, toOptions} from '../../src/util/convertValues';
 import {expect} from 'chai';
 import sleep from '../../src/util/sleep';
-import {expectEntry, expectFocus, expectValue, storeWithChangeHandler} from '../utils';
+import {expectCursor, expectEntry, expectFocus, expectValue, storeWithChangeHandler} from '../utils';
 
 describe('Multiple Mode', () => {
   it('able to select multiple values', async () => {
@@ -36,8 +36,7 @@ describe('Multiple Mode', () => {
     it('left when cursor not @ 0:0', () => {
       expect(store.activeElement).eq(store.input);
       store.setInputSelection(2, 2);
-      expect(store.activeElement.selectionStart).eq(2);
-      expect(store.activeElement.selectionEnd).eq(2);
+      expectCursor(store, 2, 2, null);
       expect(store.moveLeft()).eq(undefined);
       expect(store.activeElement).eq(store.input);
     });
@@ -89,10 +88,10 @@ describe('Multiple Mode', () => {
     describe('repeated moveLeft(), (de)selecting entries', () => {
       it('(1) does not trigger select when cursor > 0', () => {
         store.focus(1, false, 2, 2);
-        expect(store.getActiveEntry().selected, 'precondition').eq(false);
+        expect(store.getActiveEntry()!.selected, 'precondition').eq(false);
 
         expect(store.moveLeft(), 'does not prevent default').eq(undefined);
-        expect(store.getActiveEntry().selected, 'does not trigger select when cursor > 0').eq(false);
+        expect(store.getActiveEntry()!.selected, 'does not trigger select when cursor > 0').eq(false);
         expect(store.isActiveEntry(1), 'focus still on this entry').eq(true);
       });
 
@@ -100,14 +99,14 @@ describe('Multiple Mode', () => {
         store.setInputSelection(0, 0);
         expect(store.moveLeft(), 'prevents default').eq(true);
         expect(store.isActiveEntry(1), 'entry still focused').eq(true);
-        expect(store.getActiveEntry().selected, 'entry should now be selected').eq(true);
+        expect(store.getActiveEntry()!.selected, 'entry should now be selected').eq(true);
       });
 
       it('(3) goes to prev on next moveLeft()', () => {
         expect(store.moveLeft(), 'prevents default').eq(true);
         expect(store.isActiveEntry(0), 'moved to prev entry now').eq(true);
         expect(store.getSelectedEntries(), 'all entries deselected').lengthOf(0);
-        expect(store.activeElement.selectionStart, 'cursor at end of input').eq(-1);
+        expect(store.activeElement!.selectionStart, 'cursor at end of input').eq(-1);
       });
 
       it('(4) cursor movement is now normal', () => {
@@ -122,10 +121,10 @@ describe('Multiple Mode', () => {
     describe('repeated moveRight(), (de)selecting entries', () => {
       it('(1) does not trigger select when cursor > 0', () => {
         store.focus(0, false, 3, 3);
-        expect(store.getActiveEntry().selected, 'precondition').eq(false);
+        expect(store.getActiveEntry()!.selected, 'precondition').eq(false);
 
         expect(store.moveRight(), 'should NOT prevent default').eq(undefined);
-        expect(store.getActiveEntry().selected, 'does not trigger select when cursor > len').eq(false);
+        expect(store.getActiveEntry()!.selected, 'does not trigger select when cursor > len').eq(false);
         expect(store.getActiveEntryIdx(), 'focus should still be on this entry').eq(0);
       });
 
@@ -133,14 +132,14 @@ describe('Multiple Mode', () => {
         store.setInputSelection(5, 5);
         expect(store.moveRight(), 'should prevent default').eq(true);
         expect(store.getActiveEntryIdx(), 'entry[1] should now be focused').eq(1);
-        expect(store.getActiveEntry().selected, 'entry[1] should also be selected').eq(true);
+        expect(store.getActiveEntry()!.selected, 'entry[1] should also be selected').eq(true);
       });
 
       it('(3) deselects entry', () => {
         expect(store.moveRight(), 'should prevent default').eq(true);
         expect(store.getActiveEntryIdx(), 'moved to next entry now').eq(1);
         expect(store.getSelectedEntries(), 'all entries deselected').lengthOf(0);
-        expect(store.activeElement.selectionStart, 'cursor at end of input').eq(0);
+        expect(store.activeElement!.selectionStart, 'cursor at end of input').eq(0);
       });
 
       it('(4) cursor movement is now normal', () => {
@@ -357,7 +356,7 @@ describe('Multiple Mode', () => {
       store.clearSelectedItems();
       expect(store.moveToHome(), 'should preventDefault()').eq(true);
       expect(store.isActiveEntry(0), 'goes to first entry').eq(true);
-      expect(store.getActiveEntry().input.selectionStart, 'selectionStart of entry input should be 0').eq(0);
+      expect(store.getActiveEntry()!.input.selectionStart, 'selectionStart of entry input should be 0').eq(0);
       expect(store.getSelectedEntries(), 'only entry[0] is selected').eql([store.entries[0]]);
     });
 
@@ -369,7 +368,7 @@ describe('Multiple Mode', () => {
       store.clearDropdown();
       expect(store.moveToHome(), 'should preventDefault()').eq(true);
       expect(store.isActiveEntry(0), 'goes to first entry').eq(true);
-      expect(store.getActiveEntry().input.selectionStart, 'selectionStart of entry input should be 0').eq(0);
+      expect(store.getActiveEntry()!.input.selectionStart, 'selectionStart of entry input should be 0').eq(0);
       expect(store.getSelectedEntries(), 'only entry[0] is selected').eql([store.entries[0]]);
     });
   });
@@ -432,7 +431,7 @@ describe('Multiple Mode', () => {
       expect(store.getActiveEntryIdx()).eq(0);
       expect(store.moveToEnd(), 'should call preventDefault()').eq(true);
       expect(store.isActiveEntry(), 'main input now focused').eq(true);
-      expect(store.activeElement.selectionStart, 'resets selectionStart to 0').eq(0);
+      expect(store.activeElement!.selectionStart, 'resets selectionStart to 0').eq(0);
     });
   });
 

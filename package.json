@@ -5,7 +5,7 @@
   "main": "dist/react-assisted-search.js",
   "jsnext:main": "es/index.js",
   "module": "es/index.js",
-  "typings" : "es/index.d.ts",
+  "typings": "es/index.d.ts",
   "scripts": {
     "test": "karma start karma.conf.js --single-run",
     "test:watch": "karma start karma.conf.js",
@@ -55,6 +55,7 @@
     "@types/enzyme": "^3.1.9",
     "@types/enzyme-adapter-react-16": "^1.0.2",
     "@types/invariant": "^2.2.29",
+    "@types/lodash": "^4.14.118",
     "@types/mocha": "^5.2.5",
     "@types/prop-types": "^15.5.2",
     "@types/react": "^16.0.40",

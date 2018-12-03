@@ -46,7 +46,7 @@ export function actionProperty(target: AssistedSearchStore, propertyKey: string,
     },
     set(value) {
       Object.defineProperty(this, propertyKey, {
-        value: function(...args) {
+        value: function(...args: any[]) {
           (this as AssistedSearchStore).runInAction(() => {
             value.apply(this, args);
           }, dropdown);

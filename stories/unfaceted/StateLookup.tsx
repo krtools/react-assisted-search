@@ -6,8 +6,14 @@ import {AssistedSearchType} from '../../src/stores/AssistedSearchType';
 import '../../src/styles/assisted-search.scss';
 import '../../src/styles/assisted-search-bootstrap3.scss';
 
-import {lookupStates, lookupWithStateCodes, getDropdown, STATE} from '../lookups';
-import {AllowCustomValue, RewriteValue, AssistedSearchOptions, GetDropdown} from '../../src/types';
+import {lookupStates, lookupWithStateCodes, getDropdown} from '../lookups';
+import {
+  AllowCustomValue,
+  RewriteValue,
+  AssistedSearchOptions,
+  GetDropdown,
+  Value
+} from '../../src/types';
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
 
 export interface StateLookupProps {
@@ -26,7 +32,7 @@ export default class StateLookup extends React.Component<StateLookupProps> {
 
     let getOptionTemplate;
     if (customMenuItem) {
-      getOptionTemplate = (value) => {
+      getOptionTemplate = (value: Value) => {
         let metadata = value.metadata || {};
         return (
           <div>
@@ -41,9 +47,9 @@ export default class StateLookup extends React.Component<StateLookupProps> {
       };
     }
 
-    let getCustomDropdown: GetDropdown;
+    let getCustomDropdown: GetDropdown | null = null;
     if (customDropdown) {
-      getCustomDropdown = (items, input, facet, store) => getDropdown(items, input, {value:'state'}, store);
+      getCustomDropdown = (items, input, facet, store) => getDropdown(items, input, {value: 'state'}, store);
     }
 
     let options: AssistedSearchOptions = {
@@ -58,11 +64,11 @@ export default class StateLookup extends React.Component<StateLookupProps> {
       placeholder: 'States'
     };
 
-    return <AssistedSearch options={options}/>;
+    return <AssistedSearch options={options} />;
   }
 }
 
-async function getValuesNoDupes(q: string, facet: string, store: AssistedSearchStore) {
+async function getValuesNoDupes(q: string, facet: string | null, store: AssistedSearchStore) {
   let states = await lookupStates(q);
   let values = store.getValues().map(e => e.value);
   return states.filter(val => !values.includes(val.value));

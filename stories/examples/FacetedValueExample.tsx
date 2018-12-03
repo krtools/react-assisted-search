@@ -39,7 +39,7 @@ export default class FacetedValueExample extends React.Component<any, FacetedVal
             entries={this.state.entries}
             options={{
               minLength: 0,
-              placeholder: (facet: string) => {
+              placeholder: (facet: string | null) => {
                 return facet ? `Value for ${facet}` : 'Enter Facet';
               }
             }}

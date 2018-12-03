@@ -20,15 +20,15 @@ export default class FacetedPartial extends React.Component {
   }
 }
 
-function optionTemp(item: DropdownOption, facet: Facet, store: AssistedSearchStore): ReactNode | undefined {
-  let match = HELLO.exec(store.activeElement.value);
+function optionTemp(item: DropdownOption, facet: Facet | null, store: AssistedSearchStore): ReactNode | undefined {
+  let match = HELLO.exec(store.activeElement!.value);
   if (!item.partial || !match) {
     return undefined;
   }
 
   return (
     <span>
-      <strong>{store.activeElement.value.slice(match.index)}</strong>
+      <strong>{store.activeElement!.value.slice(match.index)}</strong>
       {item.value.slice(match.index + match[0].length)}
     </span>
   );
@@ -36,7 +36,7 @@ function optionTemp(item: DropdownOption, facet: Facet, store: AssistedSearchSto
 
 const HELLO = /(he)\S*$/;
 
-function getValuesWithPartial(value: string, facet: string): DropdownOption[] | Promise<DropdownOption[]> {
+function getValuesWithPartial(value: string, facet: string | null): DropdownOption[] | Promise<DropdownOption[]> {
   if (HELLO.test(value)) {
     return [createPartial(value.replace(HELLO, '$1') + 'llo world', 'hello world')];
   }

@@ -91,22 +91,30 @@ export default class VisualEntry extends React.Component<VisualEntryProps> {
   _checkFocus(props: VisualEntryProps) {
     let el = this._input.getInput();
 
-    if (props.store.isActiveEntry(props.entry) && document.activeElement !== el) {
+    let entry = props.entry;
+    if (props.store.isActiveEntry(entry) && document.activeElement !== el) {
       el.focus();
-      let selectionStart = props.entry.input.selectionStart;
-      if (typeof selectionStart === 'number') {
-        setSelection(el, selectionStart, props.entry.input.selectionEnd);
-        props.store.clearSelection(props.entry.input);
+      let start = entry.input.selectionStart;
+      let end = entry.input.selectionEnd;
+      if (typeof start === 'number' && typeof end === 'number') {
+        setSelection(el, start, end);
+        props.store.clearSelection(entry.input);
       }
     }
   }
 
   render() {
     let entry = this.props.entry;
-    let searchEntry = entry.entry;
     let store = this.props.store;
 
+    let searchEntry = entry.entry;
+    if (!searchEntry) {
+      // TODO: look into what cases would this be null/undefined
+      return null;
+    }
+
     let facet = searchEntry.facet;
+
     let entryFacet = facet ? (
       <span className="assisted-search-entry-facet" onClick={this._focusEntry}>
         {facet.label || facet.value}

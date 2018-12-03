@@ -5,7 +5,7 @@ import {spy} from 'sinon';
 import {expect} from 'chai';
 
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
-import {expectArgs, expectEntry, expectStoreSynced} from '../utils';
+import {expectArgs, expectEntry, expectStoreSynced, getStore} from '../utils';
 import {toFacetValue} from '../../src/util/convertValues';
 import FacetedValue, {FacetedValueProps} from '../../src/impl/FacetedValue';
 import {SearchEntry} from '../../src/types';
@@ -13,7 +13,7 @@ import {SearchEntry} from '../../src/types';
 describe('<FacetedValue>', () => {
   it('value in store matches initial prop value', () => {
     let el = mount(<FacetedValue entries={[toFacetValue('a', 'b')]}/>);
-    let store: AssistedSearchStore = el.instance()['_store'];
+    let store: AssistedSearchStore = getStore(el);
     expectEntry(store, 0, 'a', 'b', 1);
   });
 
@@ -29,7 +29,7 @@ describe('<FacetedValue>', () => {
 
     before(() => {
       el = mount(<FacetedValue entries={[]} onChange={fn}/>);
-      store = el.instance()['_store'];
+      store = getStore(el);
     });
 
     afterEach(() => {
@@ -80,20 +80,24 @@ describe('<FacetedValue>', () => {
     });
 
     store.focus();
-    store.setEntries([{
-      facet: {value: 'A', label: 'Ehh'},
-      value: {value: 'a'}
-    }]);
+    store.setEntries([
+      {
+        facet: {value: 'A', label: 'Ehh'},
+        value: {value: 'a'}
+      }
+    ]);
 
     let el = mount(<FacetedValue store={store}/>);
     let val = el.find('.assisted-search-entry-facet');
     expect(val).lengthOf(1);
     expect((val.getDOMNode() as HTMLElement).innerText).eq('Ehh');
 
-    store.setEntries([{
-      facet: {value: 'A'},
-      value: {value: 'a'}
-    }]);
+    store.setEntries([
+      {
+        facet: {value: 'A'},
+        value: {value: 'a'}
+      }
+    ]);
     val = el.find('.assisted-search-entry-facet');
     expect(val).lengthOf(1);
     expect((val.getDOMNode() as HTMLElement).innerText).eq('A');

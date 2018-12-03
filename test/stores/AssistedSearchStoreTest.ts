@@ -4,7 +4,7 @@ import {spy} from 'sinon';
 
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
 import {CHANGE, SUBMIT, UPDATE} from '../../src/stores/EventTypes';
-import {expectEntry, expectFacet, expectInput, expectNoFacet, storeWithChangeHandler} from '../utils';
+import {expectEntry, expectFacetCandidate, expectInput, storeWithChangeHandler} from '../utils';
 import sleep from '../../src/util/sleep';
 
 describe('AssistedSearchStore', () => {
@@ -101,22 +101,26 @@ describe('AssistedSearchStore', () => {
       expect(facets.callCount).eq(0);
       store.setInput('a');
       expect(store.isDropdownLoading()).eq(true);
-      expect(store.dropdown.content()).eq('content');
+
+      // fine with this throwing if undefined, we're in a test after all
+      const getContent = () => store.dropdown.content!();
+
+      expect(getContent()).eq('content');
       expect(facets.callCount, 'facet getter called even when custom dropdown is used').eq(1);
 
-      expect(store.dropdown.content(), 'content shows up before facets return').eq('content');
+      expect(getContent(), 'content shows up before facets return').eq('content');
       await sleep();
-      expect(store.dropdown.content(), 'content still present after facets return').eq('content');
+      expect(getContent(), 'content still present after facets return').eq('content');
       expect(store.isDropdownLoading()).eq(false);
       store.selectExact(0);
-      expectFacet(store, 'A');
+      expectFacetCandidate(store, 'A');
 
       expect(values.callCount, 'values not called yet').eq(0);
       store.setInput('b');
       expect(values.callCount, 'values now called by updateDropdown').eq(1);
-      expect(store.dropdown.content(), 'content shows up before values return').eq('content');
+      expect(getContent(), 'content shows up before values return').eq('content');
       await sleep();
-      expect(store.dropdown.content(), 'content still present after values return').eq('content');
+      expect(getContent(), 'content still present after values return').eq('content');
       store.selectExact(0);
       expectEntry(store, 0, 'A', 'a', 1);
     });
@@ -192,7 +196,7 @@ describe('AssistedSearchStore', () => {
       expect(listener.callCount).eq(0);
       await sleep();
       store.selectExact(0);
-      expectFacet(store, 'A');
+      expectFacetCandidate(store, 'A');
       expect(listener.callCount).eq(0);
 
       // setting value of entry 0

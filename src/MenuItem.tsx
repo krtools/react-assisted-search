@@ -16,7 +16,7 @@ export interface MenuItemProps {
  * Represents the default MenuItem in the dropdown list.
  */
 export default class MenuItem extends React.Component<MenuItemProps> {
-  el: HTMLDivElement;
+  el?: HTMLDivElement;
 
   setRef = (el: HTMLDivElement) => (this.el = el);
 
@@ -29,7 +29,7 @@ export default class MenuItem extends React.Component<MenuItemProps> {
   }
 
   scrollIfNeeded(props: MenuItemProps) {
-    if (props.selected) {
+    if (props.selected && this.el) {
       scrollIfNeeded(this.el);
     }
   }

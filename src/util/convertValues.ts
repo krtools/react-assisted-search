@@ -165,10 +165,11 @@ export function createPartial(value: string, label?: string): DropdownOption {
  * @param keys
  */
 export function omit<T>(object: object, ...keys: Array<string | string[]>): T & any {
-  let newObj = Object.assign({}, object);
-  let ks = [].concat(...keys);
+  let newObj = Object.assign({}, object) as any;
+  let ks = ([] as string[]).concat(...keys);
   for (let i = 0; i < ks.length; i++) {
-    delete newObj[ks[i]];
+    let str = ks[i];
+    delete newObj[str];
   }
   return newObj;
 }

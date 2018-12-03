@@ -9,7 +9,7 @@ export interface DropdownProps {
 }
 
 export default class Dropdown extends React.Component<DropdownProps> {
-  el: HTMLDivElement;
+  el?: HTMLDivElement;
 
   _setRef = (el: HTMLDivElement) => {
     this.el = el;

@@ -3,6 +3,8 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "target": "es5",
+    "strict": true,
+    "noUnusedLocals": true,
     "lib": [
       "esnext",
       "dom"
@@ -19,8 +21,5 @@
   },
   "files": [
     "src/index.ts"
-  ],
-  "exclude": [
-    "stories/examples/scratch/**/*"
   ]
 }

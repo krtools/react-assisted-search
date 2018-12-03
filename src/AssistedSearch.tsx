@@ -8,7 +8,7 @@ import AssistedInput from './AssistedInput';
 import VisualEntry from './VisualEntry';
 
 import {CHANGE, SUBMIT, UPDATE} from './stores/EventTypes';
-import {SearchEntry, Value, AssistedSearchOptions} from './types';
+import {AssistedSearchOptions, SearchEntry, Value} from './types';
 import {DropdownWrapper} from './DropdownItems';
 import {Pending} from './Pending';
 import {Entry} from './stores/ComponentStores';
@@ -86,7 +86,7 @@ export default class AssistedSearch extends React.Component<AssistedSearchProps>
 
   constructor(props: AssistedSearchProps) {
     super(props);
-    let store: AssistedSearchStore = this.props.store;
+    let store = this.props.store;
     if (!store) {
       store = new AssistedSearchStore(props.options || {});
     }
@@ -136,7 +136,7 @@ export default class AssistedSearch extends React.Component<AssistedSearchProps>
       });
     }
 
-    let pending = store.input.facet ? <Pending facet={store.input.facet}/> : null;
+    let pending = store.input.facet ? <Pending facet={store.input.facet} /> : null;
 
     let {style, className, ...props} = this.props;
 
@@ -152,7 +152,7 @@ export default class AssistedSearch extends React.Component<AssistedSearchProps>
       </AssistedInput>
     );
 
-    let dropdown = store.showingDropdown() ? <DropdownWrapper store={store}/> : null;
+    let dropdown = store.showingDropdown() ? <DropdownWrapper store={store} /> : null;
 
     return (
       <Container

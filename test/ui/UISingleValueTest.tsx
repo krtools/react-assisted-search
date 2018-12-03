@@ -7,18 +7,16 @@ import {spy} from 'sinon';
 import SingleValue, {SingleValueProps} from '../../src/impl/SingleValue';
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
 import {SearchEntry} from '../../src/types';
-import {expectDropdown, expectEntry, expectStoreSynced} from '../utils';
+import {expectDropdown, expectEntry, expectStoreSynced, getStore} from '../utils';
 import sleep from '../../src/util/sleep';
-import {AssistedSearch, FullWidthDropdown} from '../../src';
-import {Simulate} from 'react-dom/test-utils';
-import drop = Simulate.drop;
+import {FullWidthDropdown} from '../../src';
 import MenuItem from '../../src/MenuItem';
 import {DropdownWrapper} from '../../src/DropdownItems';
 
 describe('<SingleValue>', () => {
   it('value in store matches initial prop value', () => {
     let el = mount(<SingleValue value="abc" />);
-    let store: AssistedSearchStore = el.instance()['_store'];
+    let store: AssistedSearchStore = getStore(el);
     expect(store.input.value).eq('abc');
   });
 
@@ -36,7 +34,7 @@ describe('<SingleValue>', () => {
 
     before(() => {
       el = mount(<SingleValue value="" onChange={fn} />);
-      store = el.instance()['_store'];
+      store = getStore(el);
     });
 
     afterEach(() => {
@@ -146,7 +144,7 @@ describe('<SingleValue>', () => {
       expect(div).not.eq(undefined);
       let dropdown = div.querySelector('.assisted-search-base-dropdown');
       expect(dropdown).not.eq(undefined);
-      expect(dropdown.textContent).eq('content');
+      expect(dropdown!.textContent).eq('content');
     });
   });
 });

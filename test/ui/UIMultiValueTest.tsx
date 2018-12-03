@@ -4,14 +4,14 @@ import {mount, ReactWrapper} from 'enzyme';
 import {spy} from 'sinon';
 import {expect} from 'chai';
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
-import {expectEntry} from '../utils';
+import {expectEntry, getStore} from '../utils';
 import MultiValue, {MultiValueProps} from '../../src/impl/MultiValue';
 import {toEntries} from '../../src/util/convertValues';
 
 describe('<MultiValue>', () => {
   it('value in store matches initial prop value', () => {
     let el = mount(<MultiValue entries={['a']}/>);
-    let store: AssistedSearchStore = el.instance()['_store'];
+    let store: AssistedSearchStore = getStore(el);
     let values = store.getValues();
     expect(values).lengthOf(1);
     expect(values[0].value).eq('a');
@@ -35,7 +35,7 @@ describe('<MultiValue>', () => {
 
     before(() => {
       el = mount(<MultiValue entries={[]} onChange={fn}/>);
-      store = el.instance()['_store'];
+      store = getStore(el);
     });
 
     it('(1) initial render does not trigger onChange', () => {

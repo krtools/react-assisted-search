@@ -1,6 +1,13 @@
 import 'mocha';
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
-import {expectDropdown, expectEntry, expectNoDropdown, expectNoFacet, expectValue} from '../utils';
+import {
+  expectDropdown,
+  expectEntry,
+  expectFacetCandidate,
+  expectNoDropdown,
+  expectNoFacetCandidate,
+  expectValue
+} from '../utils';
 import sleep from '../../src/util/sleep';
 import {expect} from 'chai';
 import {spy} from 'sinon';
@@ -58,7 +65,8 @@ describe('AssistedSearchOptions', () => {
       expectDropdown(store);
       store.setSelection();
       expect(store.input.value).eq('');
-      expect(store.activeElement.facet.value).eq('a');
+
+      expectFacetCandidate(store, 'a');
 
       store.setInput('c');
       await sleep();
@@ -83,7 +91,7 @@ describe('AssistedSearchOptions', () => {
       expectDropdown(store);
       store.setSelection();
       expect(store.input.value, 'should leave input value unchanged').eq('a');
-      expectNoFacet(store);
+      expectNoFacetCandidate(store);
     });
   });
 

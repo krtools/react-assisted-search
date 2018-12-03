@@ -1,7 +1,7 @@
 import * as React from 'react';
 import FacetedValue from '../../src/impl/FacetedValue';
 import {getFacets, getValues} from '../lookups';
-import {DropdownOption, Facet, Value} from '../../src/types';
+import {DropdownOption, Facet} from '../../src/types';
 
 export default class FacetedValueWithHashtag extends React.Component<any, any> {
   render() {

@@ -15,7 +15,7 @@ export interface AssistedInputProps {
  * Represents the main input for searching, and it's container, along with the entries that precede it.
  */
 export default class AssistedInput extends React.Component<AssistedInputProps> {
-  private el: HTMLInputElement;
+  private el?: HTMLInputElement;
 
   private handleChange = (e: SyntheticEvent<HTMLInputElement>) => {
     let store = this.props.store;
@@ -38,7 +38,7 @@ export default class AssistedInput extends React.Component<AssistedInputProps> {
   private _checkFocus() {
     let store = this.props.store;
     if (store.activeElement === this.props.input) {
-      if (document.activeElement !== this.el) {
+      if (document.activeElement !== this.el && this.el) {
         this.el.focus();
       }
     }

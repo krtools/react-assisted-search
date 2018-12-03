@@ -1,35 +1,46 @@
 import {
+  AssistedSearchOptions,
   DropdownOption,
   Facet,
   GetDropdown,
   InitialValues,
+  Nullable,
   OptionTemplate,
   SearchEntry,
-  Value,
-  AssistedSearchOptions
+  Value
 } from '../types';
 
 import {CHANGE, SUBMIT, UPDATE} from './EventTypes';
-import {newEntry, newInput, toEntries, toEntry, toFacet, toFacets, toOptions} from '../util/convertValues';
+import {newEntry, newInput, toEntries, toEntry, toFacet, toFacets, toOptions, toValue} from '../util/convertValues';
 import {invokeAll} from '../util/functions';
 import {Dropdown, Entry, Input} from './ComponentStores';
 import {action, dropdownAction} from '../decorators/action';
-import {toValue} from '../util/convertValues';
 import {AssistedSearchType} from './AssistedSearchType';
-import {number} from 'prop-types';
 
 type ChangeSet = [string, SearchEntry[]];
 
+/** Returns true if there is a difference between one state and the next */
 function changed(a: ChangeSet, b: ChangeSet) {
+  // we only check the value (might need to change this later)
   if (a[0] !== b[0] || a[1].length !== b[1].length) {
     return true;
   }
-  let a1 = a[1],
-    b1 = b[1];
-  for (let i = 0; i < a1.length; i++) {
-    let ae = a1[i];
-    let be = b1[i];
-    if (ae.value.value !== be.value.value || ((ae.facet || be.facet) && ae.facet.value !== be.facet.value)) {
+
+  let aEntries = a[1];
+  let bEntries = b[1];
+
+  for (let i = 0; i < bEntries.length; i++) {
+    let ae = aEntries[i];
+    let be = bEntries[i];
+
+    if (
+      // value check between entries
+      ae.value.value !== be.value.value ||
+      // if one has a facet and the other doesn't, not same
+      !ae.facet !== !be.facet ||
+      // facet value check (be implicitly must be present by prev check)
+      (ae.facet && ae.facet.value !== be.facet!.value)
+    ) {
       return true;
     }
   }
@@ -71,10 +82,10 @@ export default class AssistedSearchStore {
   public entries: Entry[] = [];
 
   /** Indicates which input is currently focused */
-  public activeElement: Input = null;
+  public activeElement: Input | null = null;
 
   /** Tracking current dropdown lookup to ignore previous promises */
-  private _currentLookup: Promise<DropdownOption[]>;
+  private _currentLookup: Nullable<Promise<DropdownOption[]>>;
 
   private _lastValue: ChangeSet;
 
@@ -111,8 +122,7 @@ export default class AssistedSearchStore {
   public setInput(value: string, entry?: Entry | number) {
     // changing the input means a keystroke has occurred which triggers a deselection
     this.deselectEntries();
-    entry = this._entry(entry);
-    let input = entry ? entry.input : this.input;
+    let input = this._input(entry);
     input.value = value;
     // TODO reset selected entries -- most eff impl would be flat array on store
     if (input === this.activeElement) {
@@ -129,20 +139,24 @@ export default class AssistedSearchStore {
    */
   @action
   public focus(
-    entry?: Entry | number,
+    entry?: Nullable<Entry | number>,
     clearSelections: boolean = true,
     start?: number,
     end?: number
   ): AssistedSearchStore {
-    entry = this._entry(entry);
-    this.focusInput(entry ? entry.input : this.input, clearSelections, start, end);
+    this.focusInput(this._input(entry), clearSelections, start, end);
     this.deselectEntries();
     return this;
   }
 
   /** convenience to get an Entry by it value or array index */
-  private _entry(entry: Entry | number) {
-    return typeof entry === 'number' ? this.entries[entry] : entry;
+  private _entry(entry: Entry | number): Entry {
+    return typeof entry === 'number' ? this.entries[entry < 0 ? this.entries.length - entry : entry] : entry;
+  }
+
+  /** Returns either the input of the entry, or the main input if null or undefinde */
+  private _input(entry: Nullable<Entry | number>): Input {
+    return entry != undefined && entry !== -1 ? this._entry(entry).input : this.input;
   }
 
   /**
@@ -182,12 +196,15 @@ export default class AssistedSearchStore {
    * @param entry the entry to check, if null/undefined is passed, will return true if the main input is active
    */
   public isActiveEntry(entry?: Entry | number) {
-    entry = this._entry(entry);
-    return this.activeElement === (entry ? entry.input : this.input);
+    return this.activeElement === this._input(entry);
   }
 
   // does not need to be an action as we don't react to this
-  public setInputSelection(start: number, end: number, input: Input = this.activeElement): void {
+  public setInputSelection(
+    start: number | null,
+    end: number | null,
+    input: Nullable<Input> = this.activeElement
+  ): void {
     if (input) {
       input.selectionStart = start;
       input.selectionEnd = end;
@@ -196,6 +213,7 @@ export default class AssistedSearchStore {
 
   /**
    * A convenience to set the input selection based on a DOM input element.
+   *
    * @param el
    * @param entry
    */
@@ -205,13 +223,15 @@ export default class AssistedSearchStore {
 
   /**
    * Handles the state change for the expected behavior of the "home" key
+   *
+   * NOTE: Assumes the input is focused
    */
-  public moveToHome(): true | boolean {
+  public moveToHome(): true | void {
     if (this.showingDropdown() && this.hasSelectedItems()) {
       this.setSelectedItems([0]);
       return true;
     }
-    const input = this.activeElement;
+    const input = this.activeElement!;
     const cursorPos = input.selectionStart;
     if (cursorPos === 0 && this.entries.length > 0) {
       this.focus(0, false, 0, 0);
@@ -222,13 +242,16 @@ export default class AssistedSearchStore {
 
   /**
    * Handles the state change for the expected behavior of the "end" key
+   *
+   * NOTE: Assumes the input is focused
    */
-  public moveToEnd(): true | boolean {
+  public moveToEnd(): true | void {
     if (this.showingDropdown() && this.hasSelectedItems()) {
       this.setSelectedItems([this.dropdown.items.length - 1]);
       return true;
     }
-    const input = this.activeElement;
+    // ts note: should never be null unless bad dispatch
+    const input = this.activeElement!;
     const cursorPos = input.selectionStart;
     if (cursorPos === input.value.length && this.getActiveEntry()) {
       this.focus(-1, false, 0, 0);
@@ -241,12 +264,14 @@ export default class AssistedSearchStore {
   /**
    * React to the text cursor moving left or right. The selectionStart/End of the active input MUST be updated first.
    * Returns true if an action precludes the default browser behaviour
+   *
+   * NOTE: Assumes the input is focused
    */
-  public moveLeft(): true | boolean {
-    const input = this.activeElement;
-    const cursorPos = input.selectionStart;
+  public moveLeft(): true | void {
+    const input = this.activeElement!;
+    const cursorPos = input.selectionStart!;
     const entriesLen = this.entries.length;
-    const entry = this.getActiveEntry();
+    const entry = this.getActiveEntry()!;
     const entryIdx = this.entries.indexOf(entry);
 
     // setting to entryLen (max + 1) implies we're on main input
@@ -271,13 +296,15 @@ export default class AssistedSearchStore {
   /**
    * React to the text cursor moving right. The selectionStart/End of the focused input must be updated first.
    * @returns true if the state behavior precludes the default browser behavior
+   *
+   * NOTE: Assumes the input is focused
    */
-  public moveRight(): true | boolean {
-    let input = this.activeElement;
+  public moveRight(): true | void {
+    let input = this.activeElement!;
 
     const cursorPos = input.selectionStart;
     const inputLen = input.value.length;
-    const entry = this.getActiveEntry();
+    const entry = this.getActiveEntry()!;
 
     // when caret is not at end of input or on last entry, do default
     if (cursorPos !== inputLen) {
@@ -353,7 +380,7 @@ export default class AssistedSearchStore {
   private _ud: boolean = false;
 
   /** Is true if we're suppressing change events */
-  private _c: boolean;
+  private _c?: boolean;
 
   /** True if next update should trigger a submit event */
   private _s: boolean = false;
@@ -392,7 +419,7 @@ export default class AssistedSearchStore {
   }
 
   /** Returns the currently focused entry, if there is one */
-  public getActiveEntry(): Entry {
+  public getActiveEntry(): Entry | undefined {
     return this.entries.find(e => this.activeElement === e.input);
   }
 
@@ -402,13 +429,13 @@ export default class AssistedSearchStore {
   }
 
   /** Returns the facet of the active entry, if there is one */
-  public getActiveFacet(): Facet {
+  public getActiveFacet(): Facet | null {
     let input = this.activeElement;
     if (input && input.facet) {
       return input.facet;
     }
     let activeEntry = this.getActiveEntry();
-    return activeEntry ? activeEntry.entry.facet : null;
+    return activeEntry ? activeEntry.entry.facet || null : null;
   }
 
   /** Returns activeFacet().value, if there is one (faceted mode only) */
@@ -445,14 +472,14 @@ export default class AssistedSearchStore {
   }
 
   /** Returns the current input value */
-  public getActiveInput(): string {
+  public getActiveInput(): string | null {
     let active = this.activeElement;
     return active ? active.value : null;
   }
 
   /** Reset selection states after blur */
   @action
-  private resetSelections(): void {
+  public resetSelections(): void {
     // TODO: consistent/performant selection strategy for entries and dropdown items
     this.deselectEntries();
     this.setSelectedItems([]);
@@ -495,7 +522,11 @@ export default class AssistedSearchStore {
     let getDropdown = this.getCustomDropdown();
     if (getDropdown) {
       this.dropdown.content = () => {
-        return getDropdown(this.dropdown.items, this.getActiveInput(), this.getActiveFacet(), this);
+        let activeInput = this.getActiveInput();
+        if (activeInput == null) {
+          return null;
+        }
+        return getDropdown!(this.dropdown.items, activeInput, this.getActiveFacet(), this);
       };
     }
   }
@@ -633,18 +664,21 @@ export default class AssistedSearchStore {
       return minLength;
     } else if (typeof minLength === 'function') {
       return minLength(this.input.value, currentFacet && currentFacet.value, this);
-    } else if (currentFacet && currentFacet.minLength >= 0) {
+    } else if (currentFacet && typeof currentFacet.minLength === 'number') {
       return currentFacet.minLength;
     }
+
     return 1;
   }
 
   /**
    * Perform a delete of entries, or the active facet for the main input, if needed. selectionStart/End must be updated
    * before calling. (handles action for backspace key in UI)
+   *
+   * NOTE: assumes component is focused
    */
   public deleteBehind(): true | void {
-    let input = this.activeElement;
+    let input = this.activeElement!;
     // If cursor != 0, or text selected, delete characters
     // If no entry behind us, do nothing
     let selected = this.getSelectedEntries();
@@ -653,7 +687,7 @@ export default class AssistedSearchStore {
       return;
     }
 
-    if (input.selectionStart > 0 || input.selectionStart !== input.selectionEnd) {
+    if (input.selectionStart! > 0 || input.selectionStart !== input.selectionEnd) {
       return;
     }
 
@@ -667,7 +701,7 @@ export default class AssistedSearchStore {
     }
 
     // cursor = 0 and no text selected, delete entry behind us
-    let activeEntry = this.getActiveEntry();
+    let activeEntry = this.getActiveEntry()!;
     let entryIdx = this.entries.indexOf(activeEntry);
     if (this.entries.length) {
       this.runInAction(() => {
@@ -684,8 +718,14 @@ export default class AssistedSearchStore {
     }
   }
 
+  /**
+   * Perform a delete of entries in front of the cursor. selectionStart/End must be updated before calling.
+   * (handles action for delete key in UI)
+   *
+   * NOTE: assumes component is focused
+   */
   public deleteAhead(): true | void {
-    let input = this.activeElement;
+    let input = this.activeElement!;
     let len = input.value.length;
 
     // if entries selected, delete them
@@ -700,7 +740,7 @@ export default class AssistedSearchStore {
       return;
     }
 
-    let entryIdx = this.entries.indexOf(this.getActiveEntry());
+    let entryIdx = this.entries.indexOf(this.getActiveEntry()!);
     // also do nothing if on last entry -- TODO: should we delete main input value?
     if (entryIdx === this.entries.length - 1) {
       return;
@@ -741,7 +781,8 @@ export default class AssistedSearchStore {
   private _deleteSelectedEntries() {
     let filtered = this.entries.filter(e => !e.selected);
     // focus() clears selection state, get filtered set beforehand
-    if (this.entries.includes(this.getActiveEntry())) {
+    let activeEntry = this.getActiveEntry();
+    if (activeEntry && this.entries.includes(activeEntry)) {
       this.focus();
     }
     this.entries = filtered;
@@ -752,7 +793,9 @@ export default class AssistedSearchStore {
   public getSingleValue(): Value {
     if (!this.customValues(null)) {
       let entry = this.entries[0];
-      return entry ? entry.entry.value : null;
+      if (entry) {
+        return entry.entry.value;
+      }
     }
     return {value: this.input.value};
   }
@@ -826,7 +869,7 @@ export default class AssistedSearchStore {
       this.setInput('');
     } else {
       let searchEntries = toEntries([value]);
-      this.entries = value === null ? [] : searchEntries.map(e => newEntry(e));
+      this.entries = searchEntries.map(e => newEntry(e));
       this.setInput(searchEntries[0].value.value);
     }
   }
@@ -857,7 +900,7 @@ export default class AssistedSearchStore {
 
   /** Change the value of the main input */
   @action
-  public setEntries(entries: SearchEntry[] | null): void {
+  public setEntries(entries: SearchEntry[] = []): void {
     let idx = this.getActiveEntryIdx();
     this.entries = entries === null ? [] : entries.map(e => newEntry(e));
     if (~idx) {
@@ -873,25 +916,6 @@ export default class AssistedSearchStore {
   public getValues(): Value[] {
     // TODO verify it's okay to just get [0]
     return this.entries.map(f => f.entry.value);
-  }
-
-  /**
-   * Returns a condensed version of the facet values, in object key:[values] format.
-   * @returns {object}
-   */
-  public getFacetValues(): {[key: string]: any[]} {
-    let map = {} as {
-      [key: string]: any;
-    };
-
-    this.entries.forEach(entry => {
-      let searchEntry = entry.entry;
-      let values = map[searchEntry.facet.value] || (map[searchEntry.facet.value] = []);
-      if (searchEntry.value) {
-        values.push(searchEntry.value.value);
-      }
-    });
-    return map;
   }
 
   /**
@@ -932,11 +956,7 @@ export default class AssistedSearchStore {
    * @private
    */
   @action
-  private _setCandidateFacet(
-    input: Input = this.activeElement,
-    selected: DropdownOption,
-    letOverride = true
-  ): void | true | string {
+  private _setCandidateFacet(input: Input, selected: DropdownOption, letOverride = true): void | true | string {
     let opts = this.options;
     let value: string | Value = input.value;
     // this comes before checking selected items, manually typed in value has precedence
@@ -1087,7 +1107,7 @@ export default class AssistedSearchStore {
     this._addEntry(entry, submit);
   }
 
-  private _getRewrittenValue(value: Value | string, facet?: Facet): Value {
+  private _getRewrittenValue(value: Value | string, facet?: Nullable<Facet>): Value {
     value = toValue(value);
     if (this.options.rewriteValue) {
       let rewritten = this.options.rewriteValue(value, facet, this);
@@ -1129,7 +1149,7 @@ export default class AssistedSearchStore {
     // TODO: .without() function
     let idx = this.entries.length - 1;
     let activeEntry = this.getActiveEntry();
-    if (!activeEntry) {
+    if (activeEntry) {
       idx = this.entries.indexOf(activeEntry);
     }
     let entries = this.entries;
@@ -1190,7 +1210,7 @@ export default class AssistedSearchStore {
         this.focus();
       } else {
         if (this.isFaceted() && !this.getActiveFacet()) {
-          let candidate = this._setCandidateFacet(this.activeElement, selected, submit === true);
+          let candidate = this._setCandidateFacet(this.input, selected, submit === true);
           if (typeof candidate === 'string') {
             // we set candidate, suppress submit
             doSubmit = false;
@@ -1224,7 +1244,8 @@ export default class AssistedSearchStore {
 
   @action
   private _removeEntries(idxs: number[], deleteForward?: boolean): void {
-    let activeIdx = this.entries.indexOf(this.getActiveEntry());
+    let activeEntry = this.getActiveEntry();
+    let activeIdx = activeEntry ? this.entries.indexOf(activeEntry) : -1;
     let entries = this.entries.filter((e, i) => !idxs.includes(i));
 
     // fix active entry if affected
@@ -1241,20 +1262,25 @@ export default class AssistedSearchStore {
     this.entries = entries;
   }
 
-  public setValueAndEntries(value: string | Value, entries: Array<string | Value | SearchEntry>, silent?: boolean) {
+  public setValueAndEntries(
+    value: Nullable<string | Value>,
+    entries: Nullable<Array<string | Value | SearchEntry>>,
+    silent?: boolean
+  ) {
     return silent ? this.noChange(() => this._setValue(value, entries)) : this._setValue(value, entries);
   }
 
   @action
-  private _setValue(value: string | Value, entries: Array<string | Value | SearchEntry>) {
-    if (value !== undefined) {
+  private _setValue(value: Nullable<string | Value>, entries: Nullable<Array<string | Value | SearchEntry>>) {
+    value = value === null ? '' : value;
+    if (value != undefined) {
       this.input.value = typeof value === 'string' ? value : value.value;
       if (this.isSingle()) {
         this._addEntry(toEntry(value), false);
       }
     }
     if (entries !== undefined) {
-      this.setEntries(toEntries(entries));
+      this.setEntries(entries == null ? [] : toEntries(entries));
     }
   }
 
@@ -1263,10 +1289,8 @@ export default class AssistedSearchStore {
    * Clears the selected text state of the currently focused input
    * @param input
    */
-  public clearSelection(input: Input = this.activeElement): void {
-    if (input) {
-      input.selectionStart = input.selectionEnd = null;
-    }
+  public clearSelection(input: Input): void {
+    input.selectionStart = input.selectionEnd = null;
   }
 
   /**
@@ -1293,7 +1317,7 @@ export default class AssistedSearchStore {
     return val;
   }
 
-  customValues(facet: Facet): boolean {
+  customValues(facet: Nullable<Facet>): boolean {
     if (typeof this.options.customValues === 'function' && facet) {
       return this.options.customValues(facet, this);
     }
@@ -1351,7 +1375,8 @@ export default class AssistedSearchStore {
     // is loading delay
     let doGetLoading = () => {
       this.runInAction(() => {
-        this.dropdown.loadingDropdown = this.options.getLoading(value, isFacet, this);
+        // verified to exist by _setLoading (only caller)
+        this.dropdown.loadingDropdown = this.options.getLoading!(value, isFacet, this);
       });
     };
     let loadingDelay = this.options.loadingDelay;
@@ -1365,7 +1390,6 @@ export default class AssistedSearchStore {
   @action
   _setDropdownError(error: any) {
     this._setLoading(false);
-    let rendered = error ? (this.options.getError ? this.options.getError(error, this) : null) : null;
-    this.dropdown.error = rendered;
+    this.dropdown.error = error ? (this.options.getError ? this.options.getError(error, this) : null) : null;
   }
 }

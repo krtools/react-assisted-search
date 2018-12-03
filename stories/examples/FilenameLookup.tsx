@@ -1,7 +1,7 @@
 import * as React from 'react';
 import SingleValue from '../../src/impl/SingleValue';
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
-import {DropdownOption, Facet, Value} from '../../src/types';
+import {DropdownOption, Facet} from '../../src/types';
 import KeyboardEventDispatcher from '../../src/stores/KeyboardEventDispatcher';
 
 export default class FilenameLookup extends React.Component {
@@ -40,10 +40,8 @@ export default class FilenameLookup extends React.Component {
           getValues={listFiles}
           onChange={this.onChange}
           options={{
-            onKeyDown: (e: any, store, ed) => {
-
-            },
-            optionTemplate: (v: DropdownOption, facet: Facet, store: AssistedSearchStore) => {
+            onKeyDown: this.onKeyDown,
+            optionTemplate: (v: DropdownOption, facet: Facet | null, store: AssistedSearchStore) => {
               let value = store.input.value;
               let bold = v.value.slice(0, value.length);
               let non = v.value.slice(value.length);

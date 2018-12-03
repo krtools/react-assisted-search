@@ -4,6 +4,9 @@
  */
 export function scrollIfNeeded(el: HTMLElement): void {
   let parent = el.parentElement;
+  if (!parent) {
+    return;
+  }
 
   let pHeight = parent.offsetHeight;
   let pScroll = parent.scrollTop;

@@ -66,7 +66,7 @@ export class DropdownItems extends React.Component<DropdownItemsProps> {
     let items = store.dropdown.items.map(item => {
       return (
         <MenuItem selected={store.isSelectedItem(item)} key={item.value} item={item} onSelect={this.onSelectItem}>
-          {template ? template(item, store.input.facet, store) : null}
+          {template ? template(item, store.input.facet || null, store) : null}
         </MenuItem>
       );
     });

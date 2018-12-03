@@ -2,7 +2,7 @@ import * as React from 'react';
 import MultiValue from '../../src/impl/MultiValue';
 import Json from '../util/Json';
 import {lookupStates} from '../lookups';
-import {Value} from '../../src/types';
+import {SearchEntry, Value} from '../../src/types';
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
 
 /**
@@ -13,7 +13,7 @@ export default class MultiValueExample extends React.Component<any> {
     value: ''
   };
 
-  changeValue = (value: any, entries, store: AssistedSearchStore) => {
+  changeValue = (value: any, entries: SearchEntry[], store: AssistedSearchStore) => {
     this.setState({
       value: value,
       input: store.input,
