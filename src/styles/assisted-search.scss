@@ -4,14 +4,20 @@ $selection-color: #fff;
 .assisted-search {
   display: flex;
   position: relative;
+
   &:focus {
     outline: none;
   }
 
+  &-dropdown-parent {
+    pointer-events: none;
+    z-index: 1;
+  }
+
   &-base-dropdown {
+    pointer-events: auto;
     background: white;
     box-shadow: 3px 3px 3px -1px #ccc;
-    z-index: 1;
     top: 100%;
     left: 0;
     position: absolute;
@@ -88,6 +94,7 @@ $selection-color: #fff;
     &.focused &-close > span {
       background: #777;
     }
+
     &.focused &-facet {
       color: #666;
     }
@@ -109,6 +116,7 @@ $selection-color: #fff;
         &:hover {
           background: #666;
         }
+
         &:active {
           background: #333;
         }
@@ -133,6 +141,7 @@ $selection-color: #fff;
       width: 100%;
       display: flex;
       flex-wrap: wrap;
+
       > * {
         margin-left: 2px;
       }

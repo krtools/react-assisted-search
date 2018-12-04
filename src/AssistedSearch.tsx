@@ -14,6 +14,7 @@ import {Pending} from './Pending';
 import {Entry} from './stores/ComponentStores';
 import {delegate} from './util/functions';
 import {omit} from './util/convertValues';
+import {MountedDropdown} from './MountedDropdown';
 
 export interface AssistedSearchProps {
   /**
@@ -64,10 +65,15 @@ export interface AssistedSearchProps {
    */
   store?: AssistedSearchStore;
 
+  /**
+   * An element to mount the dropdown onto.
+   */
+  mount?: HTMLElement | false;
+
   [key: string]: any;
 }
 
-const OMITTED_PROP_KEYS = ['value', 'entries', 'options', 'onAll', 'onChange', 'onSubmit', 'store'];
+const OMITTED_PROP_KEYS = ['value', 'entries', 'options', 'onAll', 'onChange', 'onSubmit', 'store', 'mount'];
 
 /**
  * The main container and entry point.
@@ -82,6 +88,17 @@ export default class AssistedSearch extends React.Component<AssistedSearchProps>
 
   _update = () => {
     this.forceUpdate();
+  };
+
+  mountRef?: MountedDropdown;
+
+  private _setMount = (el: MountedDropdown) => {
+    this.mountRef = el;
+  };
+
+  /** Returns the mounted element, or null if this is a relative mount */
+  getMountRef = (): (HTMLDivElement | null) => {
+    return this.mountRef ? this.mountRef.rel || null : null;
   };
 
   constructor(props: AssistedSearchProps) {
@@ -136,7 +153,7 @@ export default class AssistedSearch extends React.Component<AssistedSearchProps>
       });
     }
 
-    let pending = store.input.facet ? <Pending facet={store.input.facet} /> : null;
+    let pending = store.input.facet ? <Pending facet={store.input.facet}/> : null;
 
     let {style, className, ...props} = this.props;
 
@@ -152,10 +169,18 @@ export default class AssistedSearch extends React.Component<AssistedSearchProps>
       </AssistedInput>
     );
 
-    let dropdown = store.showingDropdown() ? <DropdownWrapper store={store} /> : null;
+    let dropdown = store.showingDropdown() ? <DropdownWrapper store={store}/> : null;
+    if (dropdown && this.props.mount !== false) {
+      dropdown = (
+        <MountedDropdown mount={this.props.mount || document.body} ref={this._setMount}>
+          {dropdown}
+        </MountedDropdown>
+      );
+    }
 
     return (
       <Container
+        getDropdownEl={this.getMountRef}
         style={style}
         className={className}
         onKeyDown={this.dispatcher.handler}

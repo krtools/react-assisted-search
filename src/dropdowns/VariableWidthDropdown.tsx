@@ -30,7 +30,7 @@ export class VariableWidthDropdown extends React.Component<VariableWidthDropdown
     
     return (
       <div style={outerDivStyle}>
-        <div className="assisted-search-base-dropdown" style={innerDivStyle} {...props}>
+        <div className="assisted-search-base-dropdown assisted-search-dropdown-parent" style={innerDivStyle} {...props}>
           {children}
         </div>
       </div>

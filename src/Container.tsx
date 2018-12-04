@@ -3,6 +3,7 @@ import classnames from 'classnames';
 import AssistedSearchStore from './stores/AssistedSearchStore';
 import {omit} from './util/convertValues';
 import {MouseEvent} from 'react';
+import {Nullable} from './types';
 
 export interface ContainerProps {
   children?: any;
@@ -10,6 +11,7 @@ export interface ContainerProps {
   focused?: boolean;
   onClick?: (e: MouseEvent<HTMLDivElement>) => any;
   store: AssistedSearchStore;
+  getDropdownEl: () => Nullable<HTMLElement>;
 
   [key: string]: any;
 }
@@ -27,7 +29,8 @@ export default class Container extends React.Component<ContainerProps> {
   onBlur = () => {
     // blur happens before focus, but is also annoying to manage w/ IE & react 15
     setTimeout(() => {
-      if (this.el && !this.el.contains(document.activeElement)) {
+      let del = this.props.getDropdownEl();
+      if (this.el && !this.el.contains(document.activeElement) && (!del || !del.contains(document.activeElement))) {
         this.props.store.blur();
       }
     });
@@ -43,7 +46,7 @@ export default class Container extends React.Component<ContainerProps> {
   };
 
   render() {
-    let {children, className, focused, ...props} = omit(this.props, ['store']);
+    let {children, className, focused, ...props} = omit(this.props, ['store', 'getDropdownEl']);
 
     return (
       <div

@@ -5,6 +5,7 @@ import {ReactWrapper} from 'enzyme';
 import {SinonSpy} from 'sinon';
 import {SearchEntry, AssistedSearchOptions, Facet} from '../src/types';
 import {CHANGE} from '../src/stores/EventTypes';
+import AssistedSearch from '../src/AssistedSearch';
 
 const NU = [null, undefined];
 
@@ -13,7 +14,7 @@ const NU = [null, undefined];
  * @param value
  * @param message
  */
-export function expectNotNil(value: any, message: string): void {
+export function expectNotNil(value: any, message?: string): void {
   expect(value, message).not.oneOf(NU);
 }
 
@@ -270,4 +271,12 @@ export function getStore(el: ReactWrapper): AssistedSearchStore {
   let store: AssistedSearchStore = (el.instance() as any)['_store'] as AssistedSearchStore;
   expect(store, 'expecting el._store to have the store').instanceOf(AssistedSearchStore);
   return store;
+}
+
+/**
+ * Convenience to get the mountRef function from the assisted search component
+ * @param el
+ */
+export function getInstanceDropdown(el: ReactWrapper): HTMLDivElement | null {
+  return (el.find(AssistedSearch).instance() as AssistedSearch).getMountRef();
 }

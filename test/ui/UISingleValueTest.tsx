@@ -7,7 +7,7 @@ import {spy} from 'sinon';
 import SingleValue, {SingleValueProps} from '../../src/impl/SingleValue';
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
 import {SearchEntry} from '../../src/types';
-import {expectDropdown, expectEntry, expectStoreSynced, getStore} from '../utils';
+import {expectDropdown, expectEntry, expectNotNil, expectStoreSynced, getInstanceDropdown, getStore} from '../utils';
 import sleep from '../../src/util/sleep';
 import {FullWidthDropdown} from '../../src';
 import MenuItem from '../../src/MenuItem';
@@ -15,13 +15,13 @@ import {DropdownWrapper} from '../../src/DropdownItems';
 
 describe('<SingleValue>', () => {
   it('value in store matches initial prop value', () => {
-    let el = mount(<SingleValue value="abc" />);
+    let el = mount(<SingleValue value="abc"/>);
     let store: AssistedSearchStore = getStore(el);
     expect(store.input.value).eq('abc');
   });
 
   it('value in input DOM node matches store value', () => {
-    let el = mount(<SingleValue value="abc" />);
+    let el = mount(<SingleValue value="abc"/>);
     let input = el.find('input').getDOMNode() as HTMLInputElement;
     expect(input.value).eq('abc');
     expectStoreSynced(el);
@@ -33,7 +33,7 @@ describe('<SingleValue>', () => {
     let store: AssistedSearchStore;
 
     before(() => {
-      el = mount(<SingleValue value="" onChange={fn} />);
+      el = mount(<SingleValue value="" onChange={fn}/>);
       store = getStore(el);
     });
 
@@ -82,12 +82,48 @@ describe('<SingleValue>', () => {
 
   describe('dom props', () => {
     it('passes className and style to top component', () => {
-      let el = mount(<SingleValue className="hello" style={{color: 'red'}} />);
+      let el = mount(<SingleValue className="hello" style={{color: 'red'}}/>);
       let div = el.find('.assisted-search').getDOMNode() as HTMLDivElement;
 
       expect(div).not.eq(undefined);
       expect(div.classList.contains('hello'), 'should have hello class on top container').eq(true);
       expect(div.style.color).eq('red');
+    });
+  });
+
+  describe('props.mount', () => {
+    it('mounts to body when mount=undefined', async () => {
+      let store = new AssistedSearchStore({
+        minLength: 0,
+        getValues: () => ['A']
+      });
+
+      let el = mount(<SingleValue store={store}/>);
+      store.focus();
+
+      await sleep();
+      expectDropdown(store);
+      expect(el.find('.assisted-search-base-dropdown')).lengthOf(0);
+      expect(document.querySelectorAll('body > .assisted-search-dropdown-parent')).lengthOf(1);
+      expect(document.querySelectorAll('.assisted-search-dropdown')).lengthOf(1);
+      el.unmount();
+    });
+
+    it('mounts to relative location when mount=false', async () => {
+      let store = new AssistedSearchStore({
+        minLength: 0,
+        getValues: () => ['A']
+      });
+
+      let el = mount(<SingleValue mount={false} store={store}/>);
+      store.focus();
+
+      await sleep();
+      expectDropdown(store);
+
+      expect(document.querySelectorAll('body > .assisted-search-dropdown-parent')).lengthOf(0);
+      expect(el.getDOMNode().querySelectorAll('.assisted-search-dropdown')).lengthOf(1);
+      el.unmount();
     });
   });
 
@@ -102,7 +138,7 @@ describe('<SingleValue>', () => {
       await sleep();
       expectDropdown(store);
 
-      let el = mount(<SingleValue store={store} />);
+      let el = mount(<SingleValue store={store}/>);
       expect(el.find(MenuItem)).lengthOf(2);
       expect(el.find(DropdownWrapper)).lengthOf(1);
     });
@@ -117,7 +153,7 @@ describe('<SingleValue>', () => {
       await sleep();
       expectDropdown(store);
 
-      let el = mount(<SingleValue store={store} />);
+      let el = mount(<SingleValue store={store}/>);
       expect(el.find(MenuItem)).lengthOf(0);
     });
 
@@ -128,7 +164,7 @@ describe('<SingleValue>', () => {
         getValues: () => ['A', 'B'],
         getDropdown: getDropdown
       });
-      let el = mount(<SingleValue store={store} />);
+      let el = mount(<SingleValue store={store}/>);
 
       store.focus();
       store.setInput('a');
@@ -142,7 +178,9 @@ describe('<SingleValue>', () => {
 
       let div = el.find('.assisted-search').getDOMNode() as HTMLDivElement;
       expect(div).not.eq(undefined);
-      let dropdown = div.querySelector('.assisted-search-base-dropdown');
+      let dd = getInstanceDropdown(el)!;
+      expectNotNil(dd, 'dropdown should exist');
+      let dropdown = dd.querySelector('.assisted-search-base-dropdown');
       expect(dropdown).not.eq(undefined);
       expect(dropdown!.textContent).eq('content');
     });

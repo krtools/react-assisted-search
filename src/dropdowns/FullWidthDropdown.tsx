@@ -16,7 +16,7 @@ export class FullWidthDropdown extends React.Component<FullWidthDropdownProps> {
   render() {
     let {className, children, style, ...props} = this.props;
 
-    let cls = classnames('assisted-search-base-dropdown', className);
+    let cls = classnames('assisted-search-base-dropdown assisted-search-dropdown-parent', className);
 
     return (
       <div className={cls} style={{width: '100%', ...style}} {...props}>
