@@ -68,6 +68,7 @@ export default class AssistedInput extends React.Component<AssistedInputProps> {
       <div className="assisted-search-input-container">
         {children}
         <input
+          size={1}
           onChange={this.handleChange}
           {...inputProps}
           value={input.value}

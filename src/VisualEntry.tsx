@@ -141,6 +141,7 @@ export default class VisualEntry extends React.Component<VisualEntryProps> {
         {entryOperator}
         {/*<span className="assisted-search-entry-value">{entry.values[0].value}</span>*/}
         <AutosizeInput
+          size={1}
           onFocus={this._focus}
           ref={this._setRef}
           inputClassName="assisted-search-entry-value"
