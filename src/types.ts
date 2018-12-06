@@ -186,7 +186,7 @@ export interface RewriteValue {
  * Function to return the placeholder based on the current state of the component.
  */
 export interface GetPlaceholder {
-  (field: string | null, store: AssistedSearchStore): string;
+  (field: Nullable<string>, store: AssistedSearchStore): string;
 }
 
 export type ValidFacet = Facet | string;

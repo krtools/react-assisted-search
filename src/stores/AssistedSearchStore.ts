@@ -246,6 +246,9 @@ export default class AssistedSearchStore {
    * NOTE: Assumes the input is focused
    */
   public moveToEnd(): true | void {
+    if (!this.hasItems()) {
+      return;
+    }
     if (this.showingDropdown() && this.hasSelectedItems()) {
       this.setSelectedItems([this.dropdown.items.length - 1]);
       return true;
@@ -291,6 +294,10 @@ export default class AssistedSearchStore {
     const idx = entryIdx === -1 ? entriesLen - 1 : entryIdx - 1;
     this.focus(idx, false, -1, -1);
     return true;
+  }
+
+  private hasItems(): boolean {
+    return this.dropdown.items.length !== 0;
   }
 
   /**
@@ -452,18 +459,10 @@ export default class AssistedSearchStore {
    */
   public placeholder(): any {
     let opts = this.options;
-    let input = this.activeElement;
-    if (!input || input.value.length) {
-      return null;
-    }
     if (typeof opts.placeholder === 'function') {
-      return opts.placeholder(this.getActiveFacetName(), this);
-    } else if (opts.placeholder && !this.input.value.length && !this.entries.length && !this.getActiveFacet()) {
-      // by default we don't show placeholder if there is any "content" in the
-      // component. to override this, use the function
-      return opts.placeholder;
+      return opts.placeholder(this.input.facet && this.input.facet.value, this);
     }
-    return null;
+    return opts.placeholder || null;
   }
 
   /** Returns the entries */
@@ -588,6 +587,9 @@ export default class AssistedSearchStore {
    */
   @action
   public selectNextItem(offset: number = 1): void {
+    if (!this.hasItems()) {
+      return;
+    }
     let dropdown = this.dropdown;
     let item = dropdown.items.indexOf(dropdown.selected[0]);
     if (item === -1 || isNaN(item)) {
@@ -605,6 +607,9 @@ export default class AssistedSearchStore {
    */
   @action
   public selectExact(items: number[] | number, closeDropdown: boolean = false, submit?: boolean): void {
+    if (!this.hasItems()) {
+      return;
+    }
     this.setSelectedItems(typeof items === 'number' ? [items] : items);
     this.setSelection(closeDropdown, submit);
   }
@@ -614,6 +619,9 @@ export default class AssistedSearchStore {
    */
   @action
   public selectPrevItem(offset: number = 1) {
+    if (!this.hasItems()) {
+      return;
+    }
     let dropdown = this.dropdown;
     let item = dropdown.items.indexOf(dropdown.selected[0]);
     if (item === -1 || isNaN(item)) {
@@ -814,7 +822,7 @@ export default class AssistedSearchStore {
       dropdown.error ||
       (dropdown.loadingDropdown !== undefined && dropdown.loadingDropdown !== null) ||
       (dropdown.items &&
-      dropdown.items.length > 0 && //
+        dropdown.items.length > 0 && //
         // min length requirement (won't search either)
         input.value.length >= this.minLength())
     ); //

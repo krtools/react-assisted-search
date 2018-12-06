@@ -33,7 +33,6 @@ describe('Faceted Mode', () => {
 
     it('(2) displays placeholder for specific facet', async () => {
       store.setInput('a');
-      expect(store.placeholder(), 'placeholder should be null when there is a value').eq(null);
       await sleep();
       expect(store.dropdown.items).lengthOf(2);
       store.selectExact([0]);

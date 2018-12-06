@@ -162,7 +162,7 @@ export default class AssistedSearch extends React.Component<AssistedSearchProps>
         {...omit(props, OMITTED_PROP_KEYS)}
         input={store.input}
         store={store}
-        placeholder={store.activeElement === store.input ? store.placeholder() : ''}
+        placeholder={store.placeholder()}
       >
         {entries}
         {pending}
