@@ -822,7 +822,7 @@ export default class AssistedSearchStore {
       dropdown.error ||
       (dropdown.loadingDropdown !== undefined && dropdown.loadingDropdown !== null) ||
       (dropdown.items &&
-        dropdown.items.length > 0 && //
+      dropdown.items.length > 0 && //
         // min length requirement (won't search either)
         input.value.length >= this.minLength())
     ); //
@@ -964,16 +964,16 @@ export default class AssistedSearchStore {
    * @private
    */
   @action
-  private _setCandidateFacet(input: Input, selected: DropdownOption, letOverride = true): void | true | string {
+  private _setCandidateFacet(input: Input, selected: DropdownOption, isSubmit: boolean = false): void | true | string {
     let opts = this.options;
     let value: string | Value = input.value;
     // this comes before checking selected items, manually typed in value has precedence
 
     // TODO: this is quite the hack to bypass override w/ tab, should just pass isSubmit to overrideEntry
-    if (opts.overrideEntry && letOverride) {
-      let entry = opts.overrideEntry(selected || {value}, null, this);
+    if (opts.overrideEntry) {
+      let entry = opts.overrideEntry(selected || {value}, null, this, {isSubmit});
       if (entry) {
-        this._addEntry(entry);
+        this._addEntry(entry, isSubmit);
         return true;
       }
     }
@@ -982,7 +982,7 @@ export default class AssistedSearchStore {
       selected &&
       ((opts.isStandaloneValue && opts.isStandaloneValue(selected.value)) || selected.isFacet === false)
     ) {
-      this._addEntry(toEntry(selected));
+      this._addEntry(toEntry(selected), isSubmit);
       // TODO: de-dupe clearing input value
       return true;
     } else if (!selected && opts.isStandaloneValue && opts.isStandaloneValue(value)) {
@@ -990,7 +990,7 @@ export default class AssistedSearchStore {
       if (this.options.rewriteValue) {
         value = this.options.rewriteValue(toValue(value), input.facet, this);
       }
-      this._addEntry({value: toValue(value)});
+      this._addEntry({value: toValue(value)}, isSubmit);
       return true;
     } else {
       // just setting the facet candidate from the selected item in the dropdown
@@ -1078,7 +1078,7 @@ export default class AssistedSearchStore {
    * @private
    */
   @action
-  private _addValues(value: Value, submit?: boolean): void {
+  private _addValues(value: Value, submit: boolean): void {
     // TODO: break by type, i think
     let activeFacet = this.getActiveFacet();
     // if no selected items, take the input as the value
@@ -1106,7 +1106,7 @@ export default class AssistedSearchStore {
     };
 
     if (this.options.overrideEntry) {
-      let override = this.options.overrideEntry(value, activeFacet, this);
+      let override = this.options.overrideEntry(value, activeFacet, this, {isSubmit: submit || false});
       if (override) {
         entry = override;
       }
@@ -1134,7 +1134,7 @@ export default class AssistedSearchStore {
   }
 
   @action
-  private _addEntry(entry: SearchEntry, submit?: boolean): void {
+  private _addEntry(entry: SearchEntry, submit: boolean): void {
     if (!this.isSingle()) {
       this.entries.push(newEntry(entry));
     } else {

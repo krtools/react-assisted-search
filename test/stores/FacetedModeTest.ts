@@ -11,6 +11,7 @@ import {
   expectValue
 } from '../utils';
 import {createPartial, toEntry, toValue} from '../../src/util/convertValues';
+import {spy} from 'sinon';
 
 describe('Faceted Mode', () => {
   describe('placeholder()', () => {
@@ -324,6 +325,22 @@ describe('Faceted Mode', () => {
       await sleep();
       store.selectExact(0);
       expectEntry(store, 0, 'A', 'val');
+    });
+
+    it('can override entry with non-submit event', () => {
+      let overrideEntry = spy();
+      let store = new AssistedSearchStore({
+        overrideEntry: overrideEntry,
+        type: 'faceted'
+      }).focus();
+
+      store.setInput('a');
+
+      expect(overrideEntry.callCount).eq(0);
+      store.setSelection(false, false);
+      expect(overrideEntry.callCount).eq(1);
+      // did not override entry
+      expectFacetCandidate(store, 'a');
     });
   });
 });

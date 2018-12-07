@@ -14,6 +14,15 @@ export interface ConfigCallback<V, T> {
 }
 
 /**
+ * Properties that could affect the outcome of a submit. Most attributes could be derived from the store itself, so
+ * this would only include transient properties such as those related to the event that triggered the overrideEntry
+ * check
+ */
+export interface OverrideEntryAttributes {
+  isSubmit: boolean;
+}
+
+/**
  * The Configuration options for the AssistedSearchStore, and passable to <AssistedSearch> and its variants.
  */
 export interface AssistedSearchOptions {
@@ -119,7 +128,7 @@ export interface AssistedSearchOptions {
    * For example, 'country' may be a facet, but 'country:Canada' could be its own value that doesn't require a second
    * dropdown.
    *
-   * @deprecated use getEntry instead
+   * @deprecated use overrideEntry instead
    * @param input
    */
   isStandaloneValue?: Nullable<(input: string) => boolean>;
@@ -132,9 +141,15 @@ export interface AssistedSearchOptions {
    * @see AssistedSearchOptions.rewriteFacet if you want only to change the facet value
    * @param input the value currently in the focused input
    * @param facet the current facet, null if we're setting a facet, or we're in multiple/single mode
+   * @param attributes stateful information to help to decide how to formulate the entry
    * @param store the store
    */
-  overrideEntry?: (input: Value, facet: Nullable<Facet>, store: AssistedSearchStore) => SearchEntry | null | undefined;
+  overrideEntry?: (
+    input: Value,
+    facet: Nullable<Facet>,
+    store: AssistedSearchStore,
+    attributes: OverrideEntryAttributes
+  ) => SearchEntry | null | undefined;
 
   /**
    * Use this to programmatically rewrite any facet submitted to the component from the user
