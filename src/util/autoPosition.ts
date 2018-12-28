@@ -12,11 +12,11 @@ export default function autoPosition(el: Element, flipClass: string, bottomOffse
   clsList.remove(flipClass);
   let r = el.getBoundingClientRect();
 
-  let wHeight = window.innerHeight - bottomOffset;
+  let wBottom = window.innerHeight + window.pageYOffset - bottomOffset;
   let top = r.top - topOffset;
   let bottom = r.bottom - bottomOffset;
 
-  if (bottom > wHeight && top > wHeight - bottom) {
+  if (bottom > wBottom && top > wBottom - bottom) {
     clsList.add(flipClass);
   } else {
     clsList.remove(flipClass);

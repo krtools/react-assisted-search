@@ -3,6 +3,7 @@ import {CSSProperties} from 'react';
 
 export interface VariableWidthDropdownProps {
   style: object;
+
   [key: string]: any;
 }
 
@@ -13,24 +14,26 @@ export interface VariableWidthDropdownProps {
 export class VariableWidthDropdown extends React.Component<VariableWidthDropdownProps> {
   render() {
     let {children, style, ...props} = this.props;
-    
+
     let outerDivStyle = {
       pointerEvents: 'none',
       display: 'flex',
       width: '100%',
+      height: '100%',
       position: 'absolute',
-      top: '100%'
+      top: 0,
+      left: 0
     } as any;
-    
+
     let innerDivStyle = {
       pointerEvents: 'auto',
       flexBasis: 'auto',
       ...style
     } as CSSProperties;
-    
+
     return (
       <div style={outerDivStyle}>
-        <div className="assisted-search-base-dropdown assisted-search-dropdown-parent" style={innerDivStyle} {...props}>
+        <div className="assisted-search-dropdown-parent assisted-search-base-dropdown" style={innerDivStyle} {...props}>
           {children}
         </div>
       </div>

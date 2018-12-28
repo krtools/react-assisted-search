@@ -97,7 +97,7 @@ export default class AssistedSearch extends React.Component<AssistedSearchProps>
   };
 
   /** Returns the mounted element, or null if this is a relative mount */
-  getMountRef = (): (HTMLDivElement | null) => {
+  getMountRef = (): HTMLDivElement | null => {
     return this.mountRef ? this.mountRef.rel || null : null;
   };
 
@@ -153,7 +153,7 @@ export default class AssistedSearch extends React.Component<AssistedSearchProps>
       });
     }
 
-    let pending = store.input.facet ? <Pending facet={store.input.facet}/> : null;
+    let pending = store.input.facet ? <Pending facet={store.input.facet} /> : null;
 
     let {style, className, ...props} = this.props;
 
@@ -169,14 +169,14 @@ export default class AssistedSearch extends React.Component<AssistedSearchProps>
       </AssistedInput>
     );
 
-    let dropdown = store.showingDropdown() ? <DropdownWrapper store={store}/> : null;
-    if (dropdown && this.props.mount !== false) {
-      dropdown = (
-        <MountedDropdown mount={this.props.mount || document.body} ref={this._setMount}>
-          {dropdown}
-        </MountedDropdown>
-      );
-    }
+    let dropdown = store.showingDropdown() ? (
+      <MountedDropdown
+        mount={this.props.mount === false ? null : this.props.mount || document.body}
+        ref={this._setMount}
+      >
+        <DropdownWrapper store={store} />
+      </MountedDropdown>
+    ) : null;
 
     return (
       <Container

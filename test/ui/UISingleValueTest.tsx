@@ -104,7 +104,7 @@ describe('<SingleValue>', () => {
       await sleep();
       expectDropdown(store);
       expect(el.find('.assisted-search-base-dropdown')).lengthOf(0);
-      expect(document.querySelectorAll('body > .assisted-search-dropdown-parent')).lengthOf(1);
+      expect(document.querySelectorAll('body > div > .assisted-search-dropdown-parent')).lengthOf(1);
       expect(document.querySelectorAll('.assisted-search-dropdown')).lengthOf(1);
       el.unmount();
     });
