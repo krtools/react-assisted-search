@@ -136,15 +136,17 @@ export default class AssistedSearchStore {
    * @param clearSelections if true, clear the selectionStart/End
    * @param start set the selectionStart value
    * @param end set the selectionEnd value
+   * @param updateDropdown if false, ignore this focus event
    */
   @action
   public focus(
     entry?: Nullable<Entry | number>,
     clearSelections: boolean = true,
     start?: number,
-    end?: number
+    end?: number,
+    updateDropdown?: boolean
   ): AssistedSearchStore {
-    this.focusInput(this._input(entry), clearSelections, start, end);
+    this.focusInput(this._input(entry), clearSelections, start, end, updateDropdown);
     this.deselectEntries();
     return this;
   }
@@ -165,8 +167,15 @@ export default class AssistedSearchStore {
    * @param clearSelections
    * @param start
    * @param end
+   * @param updateDropdown if false, ignore this focus event
    */
-  public focusInput = (input: Input, clearSelections: boolean = true, start?: number, end?: number): void => {
+  public focusInput = (
+    input: Input,
+    clearSelections: boolean = true,
+    start?: number,
+    end?: number,
+    updateDropdown?: boolean
+  ): void => {
     if (clearSelections) {
       input.selectionStart = input.selectionEnd = null;
     }
@@ -176,7 +185,9 @@ export default class AssistedSearchStore {
     }
     if (this.activeElement !== input) {
       this.activeElement = input;
-      this.updateDropdown();
+      if (updateDropdown !== false) {
+        this.updateDropdown();
+      }
     }
   };
 
@@ -1236,8 +1247,8 @@ export default class AssistedSearchStore {
     if (doSubmit) {
       this.submit();
     }
+    this.focus(undefined, undefined, undefined, undefined, false);
     this.clearDropdown();
-    this.focus();
     // close dropdown on enter, but not when the candidate facet is being set
     if (!closeDropdown || (this.activeElement === this.input && this.input.facet)) {
       this.updateDropdown();

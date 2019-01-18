@@ -1,6 +1,6 @@
 {
   "name": "react-assisted-search",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "React Search Input with autocomplete and faceted search",
   "main": "dist/react-assisted-search.js",
   "jsnext:main": "es/index.js",

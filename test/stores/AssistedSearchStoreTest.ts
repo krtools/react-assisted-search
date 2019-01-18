@@ -4,7 +4,14 @@ import {spy} from 'sinon';
 
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
 import {CHANGE, SUBMIT, UPDATE} from '../../src/stores/EventTypes';
-import {expectEntry, expectFacetCandidate, expectInput, storeWithChangeHandler} from '../utils';
+import {
+  expectDropdown,
+  expectEntry,
+  expectFacetCandidate,
+  expectInput,
+  expectNoDropdown,
+  storeWithChangeHandler
+} from '../utils';
 import sleep from '../../src/util/sleep';
 
 describe('AssistedSearchStore', () => {
@@ -205,6 +212,29 @@ describe('AssistedSearchStore', () => {
       expect(listener.callCount).eq(0);
       store.selectExact(0);
       expect(listener.callCount).eq(1);
+    });
+  });
+
+  describe('supressing dropdown on clicking item', () => {
+    it('does not call getValues more than once', async () => {
+      let getValues = spy(() => ['a']);
+      let store = new AssistedSearchStore({
+        minLength: 1,
+        getValues: getValues
+      }).focus();
+      expect(getValues.callCount, 'getValues should not be called yet').eq(0);
+
+      await sleep();
+      store.setInput('a');
+      expect(getValues.callCount, 'getValues should be called from input change').eq(1);
+
+      await sleep();
+      expectDropdown(store);
+      store.selectExact(0, true);
+
+      await sleep();
+      expectNoDropdown(store);
+      expect(getValues.callCount, 'getValues should not be called again after selection').eq(1);
     });
   });
 });
