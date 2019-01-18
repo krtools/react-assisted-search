@@ -1,8 +1,9 @@
 import * as React from 'react';
+import classnames from 'classnames';
 import {CSSProperties} from 'react';
 
 export interface VariableWidthDropdownProps {
-  style: object;
+  style?: object;
 
   [key: string]: any;
 }
@@ -13,7 +14,7 @@ export interface VariableWidthDropdownProps {
  */
 export class VariableWidthDropdown extends React.Component<VariableWidthDropdownProps> {
   render() {
-    let {children, style, ...props} = this.props;
+    let {children, className, style, ...props} = this.props;
 
     let outerDivStyle = {
       pointerEvents: 'none',
@@ -33,7 +34,11 @@ export class VariableWidthDropdown extends React.Component<VariableWidthDropdown
 
     return (
       <div style={outerDivStyle}>
-        <div className="assisted-search-dropdown-parent assisted-search-base-dropdown" style={innerDivStyle} {...props}>
+        <div
+          {...props}
+          className={classnames('assisted-search-dropdown-parent assisted-search-base-dropdown', className)}
+          style={innerDivStyle}
+        >
           {children}
         </div>
       </div>
