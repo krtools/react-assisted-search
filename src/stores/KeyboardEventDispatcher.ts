@@ -93,8 +93,15 @@ export default class UserEventDispatcher {
    */
   selectAll = (e: SyntheticEvent<HTMLInputElement>) => {
     let target = e.target as HTMLInputElement;
-    if (this._isInput(target) && target.selectionStart === 0 && target.selectionEnd === target.value.length) {
+    let entry = this.store.getActiveEntry();
+    // if no custom values we don't select the input, we just select all entries
+    let locked = entry && !this.store.customValues(entry.entry.facet);
+    if (
+      locked ||
+      (this._isInput(target) && target.selectionStart === 0 && target.selectionEnd === target.value.length)
+    ) {
       this.store.selectEntries(this.store.entries.slice());
+      e.preventDefault();
     }
   };
 

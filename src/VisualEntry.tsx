@@ -72,13 +72,6 @@ export default class VisualEntry extends React.Component<VisualEntryProps> {
     }
   };
 
-  componentDidUpdate() {
-    let input = this._input.getInput();
-    if (input && this._isFixed() && document.activeElement === input) {
-      input.select();
-    }
-  }
-
   _isFixed() {
     let store = this.props.store;
     return !store.customValues(store.input.facet);

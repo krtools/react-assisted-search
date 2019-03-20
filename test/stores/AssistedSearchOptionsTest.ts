@@ -4,14 +4,16 @@ import {
   expectDropdown,
   expectEntry,
   expectFacetCandidate,
+  expectFocus,
   expectNoDropdown,
   expectNoFacetCandidate,
+  expectSelectedEntry,
   expectValue
 } from '../utils';
 import sleep from '../../src/util/sleep';
 import {expect} from 'chai';
 import {spy} from 'sinon';
-import {toValue} from '../../src/util/convertValues';
+import {toEntry, toValue} from '../../src/util/convertValues';
 
 describe('AssistedSearchOptions', () => {
   describe('options.autoSelectFirst', () => {
@@ -108,6 +110,70 @@ describe('AssistedSearchOptions', () => {
       expectDropdown(store, []);
       store.setSelection();
       expectEntry(store, 0, null, 'a', 1);
+    });
+
+    describe('[type=multiple][customValues=false]', () => {
+      it('home/end go straight to selected entries/main input', async () => {
+        let store = new AssistedSearchStore({
+          type: 'multiple',
+          customValues: false,
+          getValues: () => ['A', 'B']
+        }).focus();
+
+        store.setEntries(['A', 'B', 'C'].map(e => toEntry(e)));
+        store.focus();
+
+        store.setInputSelection(0, 0);
+        expectSelectedEntry(store, null);
+        store.moveToHome();
+        expectSelectedEntry(store, 0);
+        store.moveToEnd();
+        expectSelectedEntry(store, null);
+
+        // home working from a middle position
+        store.moveLeft();
+        expectSelectedEntry(store, 2);
+        store.moveToHome();
+        expectSelectedEntry(store, 0);
+
+        // end working from a middle position
+        store.moveRight();
+        expectSelectedEntry(store, 1);
+        store.moveToEnd();
+        expectSelectedEntry(store, null);
+        expectFocus(store);
+      });
+
+
+      it('left/right when no custom values is restricted to selecting entries', async () => {
+        let store = new AssistedSearchStore({
+          type: 'multiple',
+          customValues: false,
+          getValues: () => ['A']
+        }).focus();
+
+        store.setEntries(['A', 'B', 'C'].map(e => toEntry(e)));
+        store.focus();
+        expectSelectedEntry(store, null);
+        // when customValues = false, the values are not editable, and you
+        // can only select the entries
+        store.moveLeft();
+        expectSelectedEntry(store, 2);
+        store.moveLeft();
+        expectSelectedEntry(store, 1);
+        store.moveLeft();
+        expectSelectedEntry(store, 0);
+        // locks at 0
+        store.moveLeft();
+        expectSelectedEntry(store, 0);
+        store.moveRight();
+        expectSelectedEntry(store, 1);
+        store.moveRight();
+        expectSelectedEntry(store, 2);
+        store.moveRight();
+        expectSelectedEntry(store, null);
+        expectFocus(store);
+      });
     });
 
     it('disallows custom values when false', async () => {

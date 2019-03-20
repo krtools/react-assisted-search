@@ -243,6 +243,27 @@ export function expectSelected(store: AssistedSearchStore, items: number | numbe
 }
 
 /**
+ * Expect a particular entry (and only that entry) to be selected.
+ *
+ * NOTE that this not the same as the active input. This indicates that the entry itself is highlighted,
+ * and hitting delete/backspace will delete the entry itself.
+ *
+ * @param store
+ * @param entryIdx the 0-based entry index to check, if null if means ensure NONE are selected.
+ */
+export function expectSelectedEntry(store: AssistedSearchStore, entryIdx: number | null): void {
+  if (entryIdx !== null) {
+    expect(store.entries.length, `entryIdx ${entryIdx} exceeds length ${store.entries.length}`).greaterThan(entryIdx);
+  }
+  let active = store.entries.findIndex(e => !!e.selected);
+  store.entries.forEach((entry, i) => {
+    expect(entry.selected, `Entry ${entryIdx} should be selected (e[${i}] = ${entry.selected}), active=${active}`).eq(
+      i === entryIdx
+    );
+  });
+}
+
+/**
  * Convenience to expect the selectionStart and selectionEnd to match the values given at the entry given
  * @param store
  * @param start

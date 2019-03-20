@@ -146,12 +146,21 @@ export default class AssistedSearchStore {
     end?: number,
     updateDropdown?: boolean
   ): AssistedSearchStore {
-    this.focusInput(this._input(entry), clearSelections, start, end, updateDropdown);
-    this.deselectEntries();
+    let _entry = entry != null && entry !== -1 ? this._entry(entry) : null;
+    let locked = _entry !== null && !this.customValues(_entry.entry.facet);
+
+    this.focusInput(this._input(entry), clearSelections, locked ? 0 : start, locked ? 0 : end, updateDropdown);
+
+    // locking the entry if not editable
+    if (locked) {
+      this.selectEntries([_entry!]);
+    } else {
+      this.deselectEntries();
+    }
     return this;
   }
 
-  /** convenience to get an Entry by it value or array index */
+  /** convenience to get an Entry by its value or array index */
   private _entry(entry: Entry | number): Entry {
     return typeof entry === 'number' ? this.entries[entry < 0 ? this.entries.length - entry : entry] : entry;
   }
@@ -244,7 +253,8 @@ export default class AssistedSearchStore {
     }
     const input = this.activeElement!;
     const cursorPos = input.selectionStart;
-    if (cursorPos === 0 && this.entries.length > 0) {
+    let entry = this.getActiveEntry();
+    if ((cursorPos === 0 && this.entries.length > 0) || (entry && !this.customValues(entry.entry.facet))) {
       this.focus(0, false, 0, 0);
       this.selectEntries([this.entries[0]]);
       return true;
@@ -257,9 +267,6 @@ export default class AssistedSearchStore {
    * NOTE: Assumes the input is focused
    */
   public moveToEnd(): true | void {
-    if (!this.hasItems()) {
-      return;
-    }
     if (this.showingDropdown() && this.hasSelectedItems()) {
       this.setSelectedItems([this.dropdown.items.length - 1]);
       return true;
@@ -267,7 +274,8 @@ export default class AssistedSearchStore {
     // ts note: should never be null unless bad dispatch
     const input = this.activeElement!;
     const cursorPos = input.selectionStart;
-    if (cursorPos === input.value.length && this.getActiveEntry()) {
+    let entry = this.getActiveEntry();
+    if ((cursorPos === input.value.length && entry) || (entry && !this.customValues(entry.entry.facet))) {
       this.focus(-1, false, 0, 0);
       return true;
     } else {
@@ -292,7 +300,13 @@ export default class AssistedSearchStore {
     // this might seem confusing but it makes the math for switching between entries/main input easier
 
     // TODO: entry selection
-    if (cursorPos > 0 || (entryIdx === 0 && entry.selected) || entriesLen === 0 || cursorPos !== input.selectionEnd) {
+    const readonly = entryIdx !== -1 && !this.customValues(entry.entry.facet);
+
+    if (
+      (entryIdx === 0 && entry.selected) ||
+      entriesLen === 0 ||
+      (!readonly && ((!readonly && cursorPos > 0) || cursorPos !== input.selectionEnd))
+    ) {
       return;
     }
 
@@ -303,6 +317,7 @@ export default class AssistedSearchStore {
     }
 
     const idx = entryIdx === -1 ? entriesLen - 1 : entryIdx - 1;
+
     this.focus(idx, false, -1, -1);
     return true;
   }
@@ -322,10 +337,12 @@ export default class AssistedSearchStore {
 
     const cursorPos = input.selectionStart;
     const inputLen = input.value.length;
-    const entry = this.getActiveEntry()!;
+    const entry = this.getActiveEntry();
+
+    const readonly = entry && !this.customValues(entry.entry.facet);
 
     // when caret is not at end of input or on last entry, do default
-    if (cursorPos !== inputLen) {
+    if (!entry || (!readonly && cursorPos !== inputLen)) {
       if (entry && entry.selected) {
         this.deselectEntries();
         return true;
@@ -336,12 +353,14 @@ export default class AssistedSearchStore {
     const entryLen = this.entries.length;
     const activeEntryIdx = this.entries.indexOf(entry);
 
-    // if we a forward entry to go to, select and focus it, setting cursor to 0
+    // if we have a forward entry to go to, select and focus it, setting cursor to 0
     if (activeEntryIdx > -1 && activeEntryIdx !== entryLen - 1 && !entry.selected) {
       this.runInAction(() => {
         this.focus(activeEntryIdx + 1, false, 0, 0);
         // put this 2nd since focus() blows away entry selection
-        this.selectEntries([this.entries[activeEntryIdx + 1]]);
+        if (!readonly) {
+          this.selectEntries([this.entries[activeEntryIdx + 1]]);
+        }
       });
       return true;
     }
@@ -1336,6 +1355,12 @@ export default class AssistedSearchStore {
     return val;
   }
 
+  /**
+   * Returns true if the given facet supports custom values. If nothing is passed,
+   * returns the option passed in (or the default).
+   *
+   * @param facet
+   */
   customValues(facet: Nullable<Facet>): boolean {
     if (typeof this.options.customValues === 'function' && facet) {
       return this.options.customValues(facet, this);
