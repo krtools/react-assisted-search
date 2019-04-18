@@ -8,7 +8,7 @@ import AssistedInput from './AssistedInput';
 import VisualEntry from './VisualEntry';
 
 import {CHANGE, SUBMIT, UPDATE} from './stores/EventTypes';
-import {AssistedSearchOptions, SearchEntry, Value} from './types';
+import {AssistedSearchOptions, Nullable, SearchEntry, Value} from './types';
 import {DropdownWrapper} from './DropdownItems';
 import {Pending} from './Pending';
 import {Entry} from './stores/ComponentStores';
@@ -68,7 +68,7 @@ export interface AssistedSearchProps {
   /**
    * An element to mount the dropdown onto.
    */
-  mount?: HTMLElement | false;
+  mount?: HTMLElement | false | (() => Nullable<HTMLElement>);
 
   [key: string]: any;
 }
@@ -169,9 +169,10 @@ export default class AssistedSearch extends React.Component<AssistedSearchProps>
       </AssistedInput>
     );
 
+    let mount = this.props.mount;
     let dropdown = store.showingDropdown() ? (
       <MountedDropdown
-        mount={this.props.mount === false ? null : this.props.mount || document.body}
+        mount={mount === false ? null : (typeof mount === 'function' ? mount() : mount) || document.body}
         ref={this._setMount}
       >
         <DropdownWrapper store={store} />

@@ -15,13 +15,13 @@ import {DropdownWrapper} from '../../src/DropdownItems';
 
 describe('<SingleValue>', () => {
   it('value in store matches initial prop value', () => {
-    let el = mount(<SingleValue value="abc"/>);
+    let el = mount(<SingleValue value="abc" />);
     let store: AssistedSearchStore = getStore(el);
     expect(store.input.value).eq('abc');
   });
 
   it('value in input DOM node matches store value', () => {
-    let el = mount(<SingleValue value="abc"/>);
+    let el = mount(<SingleValue value="abc" />);
     let input = el.find('input').getDOMNode() as HTMLInputElement;
     expect(input.value).eq('abc');
     expectStoreSynced(el);
@@ -33,7 +33,7 @@ describe('<SingleValue>', () => {
     let store: AssistedSearchStore;
 
     before(() => {
-      el = mount(<SingleValue value="" onChange={fn}/>);
+      el = mount(<SingleValue value="" onChange={fn} />);
       store = getStore(el);
     });
 
@@ -82,7 +82,7 @@ describe('<SingleValue>', () => {
 
   describe('dom props', () => {
     it('passes className and style to top component', () => {
-      let el = mount(<SingleValue className="hello" style={{color: 'red'}}/>);
+      let el = mount(<SingleValue className="hello" style={{color: 'red'}} />);
       let div = el.find('.assisted-search').getDOMNode() as HTMLDivElement;
 
       expect(div).not.eq(undefined);
@@ -98,7 +98,24 @@ describe('<SingleValue>', () => {
         getValues: () => ['A']
       });
 
-      let el = mount(<SingleValue store={store}/>);
+      let el = mount(<SingleValue store={store} />);
+      store.focus();
+
+      await sleep();
+      expectDropdown(store);
+      expect(el.find('.assisted-search-base-dropdown')).lengthOf(0);
+      expect(document.querySelectorAll('body > div > .assisted-search-dropdown-parent')).lengthOf(1);
+      expect(document.querySelectorAll('.assisted-search-dropdown')).lengthOf(1);
+      el.unmount();
+    });
+
+    it('mounts to an element defined by a function', async () => {
+      let store = new AssistedSearchStore({
+        minLength: 0,
+        getValues: () => ['A']
+      });
+
+      let el = mount(<SingleValue store={store} mount={() => document.body} />);
       store.focus();
 
       await sleep();
@@ -115,7 +132,7 @@ describe('<SingleValue>', () => {
         getValues: () => ['A']
       });
 
-      let el = mount(<SingleValue mount={false} store={store}/>);
+      let el = mount(<SingleValue mount={false} store={store} />);
       store.focus();
 
       await sleep();
@@ -138,7 +155,7 @@ describe('<SingleValue>', () => {
       await sleep();
       expectDropdown(store);
 
-      let el = mount(<SingleValue store={store}/>);
+      let el = mount(<SingleValue store={store} />);
       expect(el.find(MenuItem)).lengthOf(2);
       expect(el.find(DropdownWrapper)).lengthOf(1);
     });
@@ -153,7 +170,7 @@ describe('<SingleValue>', () => {
       await sleep();
       expectDropdown(store);
 
-      let el = mount(<SingleValue store={store}/>);
+      let el = mount(<SingleValue store={store} />);
       expect(el.find(MenuItem)).lengthOf(0);
     });
 
@@ -164,7 +181,7 @@ describe('<SingleValue>', () => {
         getValues: () => ['A', 'B'],
         getDropdown: getDropdown
       });
-      let el = mount(<SingleValue store={store}/>);
+      let el = mount(<SingleValue store={store} />);
 
       store.focus();
       store.setInput('a');

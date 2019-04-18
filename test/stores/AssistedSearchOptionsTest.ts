@@ -144,7 +144,6 @@ describe('AssistedSearchOptions', () => {
         expectFocus(store);
       });
 
-
       it('left/right when no custom values is restricted to selecting entries', async () => {
         let store = new AssistedSearchStore({
           type: 'multiple',
