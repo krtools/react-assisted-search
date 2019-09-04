@@ -7,7 +7,7 @@ import Container from './Container';
 import AssistedInput from './AssistedInput';
 import VisualEntry from './VisualEntry';
 
-import {CHANGE, SUBMIT, UPDATE} from './stores/EventTypes';
+import {BLUR, CHANGE, SUBMIT, UPDATE} from './stores/EventTypes';
 import {AssistedSearchOptions, Nullable, SearchEntry, Value} from './types';
 import {DropdownWrapper} from './DropdownItems';
 import {Pending} from './Pending';
@@ -44,6 +44,15 @@ export interface AssistedSearchProps {
   onAll?: (type: string, store: AssistedSearchStore) => any;
 
   /**
+   * Fires when the component loses focus to an external element.
+   *
+   * @param val
+   * @param entires
+   * @param store
+   */
+  onBlur?: (val: string, entries: SearchEntry[], store: AssistedSearchStore) => any;
+
+  /**
    * Fires when the value of the component changes.
    * @param val
    * @param entries
@@ -73,7 +82,7 @@ export interface AssistedSearchProps {
   [key: string]: any;
 }
 
-const OMITTED_PROP_KEYS = ['value', 'entries', 'options', 'onAll', 'onChange', 'onSubmit', 'store', 'mount'];
+const OMITTED_PROP_KEYS = ['value', 'entries', 'options', 'onAll', 'onChange', 'onBlur', 'onSubmit', 'store', 'mount'];
 
 /**
  * The main container and entry point.
@@ -113,6 +122,7 @@ export default class AssistedSearch extends React.Component<AssistedSearchProps>
     this.store.addListener(UPDATE, this._update);
     this.store.addListener(CHANGE, delegate(() => this.props.onChange));
     this.store.addListener(SUBMIT, delegate(() => this.props.onSubmit));
+    this.store.addListener(BLUR, delegate(() => this.props.onBlur));
     if (this.props.onAll) {
       this.store.addListener('all', this.props.onAll);
     }

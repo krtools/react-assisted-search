@@ -10,7 +10,7 @@ import {
   Value
 } from '../types';
 
-import {CHANGE, SUBMIT, UPDATE} from './EventTypes';
+import {BLUR, CHANGE, SUBMIT, UPDATE} from './EventTypes';
 import {newEntry, newInput, toEntries, toEntry, toFacet, toFacets, toOptions, toValue} from '../util/convertValues';
 import {invokeAll} from '../util/functions';
 import {Dropdown, Entry, Input} from './ComponentStores';
@@ -203,6 +203,9 @@ export default class AssistedSearchStore {
   @action
   public blur = () => {
     this.clearDropdown();
+    if (this.activeElement != null) {
+      this._b = true;
+    }
     this.activeElement = null;
   };
 
@@ -422,12 +425,16 @@ export default class AssistedSearchStore {
   /** True if next update should trigger a submit event */
   private _s: boolean = false;
 
+  private _b: boolean = false;
+
   /** Dispatch the update event to any listeners. Note that additional changes will trigger a secondary update event */
   private _update = (): void => {
     // change _u and _s first in case callback forces another update
     this._u = false;
     let submitting = this._s;
     this._s = false;
+    let blurring = this._b;
+    this._b = false;
     this._dispatch(UPDATE);
 
     // change event only triggers if a value/entry changed
@@ -438,6 +445,9 @@ export default class AssistedSearchStore {
     this._lastValue = value;
     if (submitting) {
       this._dispatch(SUBMIT, value[0], value[1]);
+    }
+    if (blurring && !this.activeElement) {
+      this._dispatch(BLUR, value[0], value[1]);
     }
   };
 

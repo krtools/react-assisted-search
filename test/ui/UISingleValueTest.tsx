@@ -14,6 +14,20 @@ import MenuItem from '../../src/MenuItem';
 import {DropdownWrapper} from '../../src/DropdownItems';
 
 describe('<SingleValue>', () => {
+  it('dispatches blur event', () => {
+    const onBlur = spy();
+    const el = mount(<SingleValue value="abc" onBlur={onBlur} />);
+    const store = getStore(el);
+    store.blur();
+    expect(onBlur.callCount, "wasn't focused, so should not call yet").eq(0);
+    store.focus();
+    expect(onBlur.callCount).eq(0);
+    store.blur();
+    expect(onBlur.callCount).eq(1);
+    store.blur();
+    expect(onBlur.callCount).eq(1);
+  });
+
   it('value in store matches initial prop value', () => {
     let el = mount(<SingleValue value="abc" />);
     let store: AssistedSearchStore = getStore(el);

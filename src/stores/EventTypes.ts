@@ -15,3 +15,8 @@ export const CHANGE = 'change';
  * pressing enter
  */
 export const SUBMIT = 'submit';
+
+/**
+ * Represents the component losing focus to an element not inside the top-level container
+ */
+export const BLUR = 'blur';

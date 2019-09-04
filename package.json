@@ -1,6 +1,6 @@
 {
   "name": "react-assisted-search",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "React Search Input with autocomplete and faceted search",
   "main": "dist/react-assisted-search.js",
   "jsnext:main": "es/index.js",
@@ -105,7 +105,7 @@
     "karma-webpack": "^2.0.9",
     "lodash": "^4.17.5",
     "mocha": "5.0.0",
-    "node-sass": "^4.10.0",
+    "node-sass": "4.12.0",
     "prettier": "1.15.3",
     "react": "^16.2.0",
     "react-dom": "^16.3.2",

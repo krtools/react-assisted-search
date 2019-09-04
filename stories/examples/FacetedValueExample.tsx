@@ -2,7 +2,7 @@ import * as React from 'react';
 import FacetedValue from '../../src/impl/FacetedValue';
 import {getFacets, getValues} from '../lookups';
 import AssistedSearchStore from '../../src/stores/AssistedSearchStore';
-import {SearchEntry} from '../../src/types';
+import {Nullable, SearchEntry} from '../../src/types';
 import {Input} from '../../src/stores/ComponentStores';
 
 export interface FacetedValueExampleState {
@@ -39,7 +39,7 @@ export default class FacetedValueExample extends React.Component<any, FacetedVal
             entries={this.state.entries}
             options={{
               minLength: 0,
-              placeholder: (facet: string | null) => {
+              placeholder: (facet: Nullable<string>) => {
                 return facet ? `Value for ${facet}` : 'Enter Facet';
               }
             }}
@@ -47,12 +47,12 @@ export default class FacetedValueExample extends React.Component<any, FacetedVal
         </div>
         <div className="col-sm-6">
           <h4>Output</h4>
-          <hr/>
+          <hr />
           <div className="well well-sm">
             <h4>Input: {state.input ? state.input.value : ''}</h4>
           </div>
-          <EntryTable entries={state.entries || []}/>
-          <p/>
+          <EntryTable entries={state.entries || []} />
+          <p />
         </div>
       </div>
     );
@@ -86,10 +86,10 @@ class EntryTable extends React.Component<EntryTableProps> {
     return (
       <table className="table">
         <thead>
-        <tr>
-          <th>Facet</th>
-          <th>Value</th>
-        </tr>
+          <tr>
+            <th>Facet</th>
+            <th>Value</th>
+          </tr>
         </thead>
         <tbody>{rows}</tbody>
       </table>

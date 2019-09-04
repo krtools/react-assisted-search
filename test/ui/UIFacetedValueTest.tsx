@@ -11,14 +11,28 @@ import FacetedValue, {FacetedValueProps} from '../../src/impl/FacetedValue';
 import {SearchEntry} from '../../src/types';
 
 describe('<FacetedValue>', () => {
+  it('dispatches blur event', () => {
+    const onBlur = spy();
+    const el = mount(<FacetedValue value="abc" onBlur={onBlur} />);
+    const store = getStore(el);
+    store.blur();
+    expect(onBlur.callCount, "wasn't focused, so should not call yet").eq(0);
+    store.focus();
+    expect(onBlur.callCount).eq(0);
+    store.blur();
+    expect(onBlur.callCount).eq(1);
+    store.blur();
+    expect(onBlur.callCount).eq(1);
+  });
+
   it('value in store matches initial prop value', () => {
-    let el = mount(<FacetedValue entries={[toFacetValue('a', 'b')]}/>);
+    let el = mount(<FacetedValue entries={[toFacetValue('a', 'b')]} />);
     let store: AssistedSearchStore = getStore(el);
     expectEntry(store, 0, 'a', 'b', 1);
   });
 
   it('prop-populates entries', () => {
-    let el = mount(<FacetedValue entries={[toFacetValue('a', 'b'), toFacetValue('c', 'd')]}/>);
+    let el = mount(<FacetedValue entries={[toFacetValue('a', 'b'), toFacetValue('c', 'd')]} />);
     expectStoreSynced(el);
   });
 
@@ -28,7 +42,7 @@ describe('<FacetedValue>', () => {
     let store: AssistedSearchStore;
 
     before(() => {
-      el = mount(<FacetedValue entries={[]} onChange={fn}/>);
+      el = mount(<FacetedValue entries={[]} onChange={fn} />);
       store = getStore(el);
     });
 
@@ -87,7 +101,7 @@ describe('<FacetedValue>', () => {
       }
     ]);
 
-    let el = mount(<FacetedValue store={store}/>);
+    let el = mount(<FacetedValue store={store} />);
     let val = el.find('.assisted-search-entry-facet');
     expect(val).lengthOf(1);
     expect((val.getDOMNode() as HTMLElement).innerText).eq('Ehh');
