@@ -44,7 +44,7 @@ export default class AssistedInput extends React.Component<AssistedInputProps> {
     }
   }
 
-  private onFocus = (e: SyntheticEvent<HTMLInputElement>) => {
+  private onFocus = (e: FocusEvent) => {
     this.props.store.focus();
     if (this.props.onFocus) {
       this.props.onFocus(e);
@@ -53,6 +53,9 @@ export default class AssistedInput extends React.Component<AssistedInputProps> {
 
   private _setEl = (el: HTMLInputElement) => {
     this.el = el;
+    if (el) {
+      el.addEventListener('focus', this.onFocus);
+    }
   };
 
   render() {
