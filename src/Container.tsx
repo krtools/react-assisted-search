@@ -27,14 +27,14 @@ export default class Container extends React.Component<ContainerProps> {
   };
 
   onBlur = () => {
-    // tentatively set to state to blurred, but do not commit state yet
-    // this is to prevent a focus enforcement loop
-    this.props.store.activeElement = null;
-    // blur happens before focus, but is also annoying to manage w/ IE & react 15
+    const store = this.props.store;
+    store._pendingBlur = true;
     setTimeout(() => {
-      let del = this.props.getDropdownEl();
-      if (this.el && !this.el.contains(document.activeElement) && (!del || !del.contains(document.activeElement))) {
-        this.props.store.blur();
+      const dropdown = this.props.getDropdownEl();
+      const activeElement = document.activeElement;
+      const el = this.el;
+      if (store._pendingBlur && el && !el.contains(activeElement) && (!dropdown || !dropdown.contains(activeElement))) {
+        store.blur();
       }
     });
   };

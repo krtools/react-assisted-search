@@ -89,6 +89,9 @@ export default class AssistedSearchStore {
 
   private _lastValue: ChangeSet;
 
+  /** Internal use for async tracking of a pending blur event */
+  public _pendingBlur = false;
+
   private _changeSet(): ChangeSet {
     return [this.input.value, this.getEntries()];
   }
@@ -185,6 +188,7 @@ export default class AssistedSearchStore {
     end?: number,
     updateDropdown?: boolean
   ): void => {
+    this._pendingBlur = false;
     if (clearSelections) {
       input.selectionStart = input.selectionEnd = null;
     }

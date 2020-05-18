@@ -134,6 +134,7 @@ export default class AssistedSearch extends React.Component<AssistedSearchProps>
   }
 
   private _focus = () => {
+    this.store._pendingBlur = false;
     if (!this.store.activeElement) {
       this.store.focus();
     }
