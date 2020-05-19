@@ -37,7 +37,7 @@ export default class AssistedInput extends React.Component<AssistedInputProps> {
 
   private _checkFocus() {
     let store = this.props.store;
-    if (store.activeElement === this.props.input) {
+    if (store.activeElement === this.props.input && !store._pendingBlur) {
       if (document.activeElement !== this.el && this.el) {
         this.el.focus();
       }
