@@ -38,9 +38,9 @@ export class MountedDropdown extends React.Component<MountedDropdownProps> {
       // use relevant style of parent for scaffolding div
       let bbox = this.el.getBoundingClientRect();
       Object.assign(this.rel.style, {
-        position: 'absolute',
+        position: 'fixed',
         left: `${bbox.left}px`,
-        top: `${bbox.top + window.pageYOffset}px`,
+        top: `${bbox.top}px`,
         width: `${bbox.width}px`,
         height: `${bbox.height}px`
       });
