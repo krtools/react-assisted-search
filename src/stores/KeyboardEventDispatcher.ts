@@ -186,7 +186,9 @@ export default class UserEventDispatcher {
   enter = (e: SyntheticEvent<HTMLInputElement>) => {
     if (this._isInput(e.target as Element)) {
       this.store.setSelection(true, true);
-      e.preventDefault();
+      if (this.store.options.allowSubmitEvent !== true) {
+        e.preventDefault();
+      }
     }
   };
 

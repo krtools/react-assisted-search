@@ -163,6 +163,9 @@ export interface AssistedSearchOptions {
 
   /** Use this to override the default dropdown item template. If the function returns null/undefined, the default will be used. */
   optionTemplate?: Nullable<OptionTemplate>;
+
+  /** When true, will not fire event.preventDefault() on the enter key handler */
+  allowSubmitEvent?: boolean;
 }
 
 /** Function to return a completely custom dropdown */
