@@ -43,7 +43,16 @@ let config = {
       {
         test: /\.scss$/,
         use: ExtractTextPlugin.extract({
-          use: ['css-loader', 'postcss-loader', 'sass-loader']
+          use: [
+            'css-loader',
+            'postcss-loader',
+            {
+              loader: 'sass-loader',
+              options: {
+                implementation: require('sass')
+              }
+            }
+          ]
         })
       }
     ]

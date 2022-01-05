@@ -122,10 +122,12 @@ export default class AssistedSearchStore {
    * @param entry
    */
   @action
-  public setInput(value: string, entry?: Entry | number) {
+  public setInput(value: string, entry?: Entry | number): void {
+    const input = this._input(entry);
+    if (!input) return;
+
     // changing the input means a keystroke has occurred which triggers a deselection
     this.deselectEntries();
-    let input = this._input(entry);
     input.value = value;
     // TODO reset selected entries -- most eff impl would be flat array on store
     if (input === this.activeElement) {
@@ -149,10 +151,9 @@ export default class AssistedSearchStore {
     end?: number,
     updateDropdown?: boolean
   ): AssistedSearchStore {
-    let _entry = entry != null && entry !== -1 ? this._entry(entry) : null;
-    let locked = _entry !== null && !this.customValues(_entry.entry.facet);
-
-    this.focusInput(this._input(entry), clearSelections, locked ? 0 : start, locked ? 0 : end, updateDropdown);
+    const _entry = entry != null && entry !== -1 ? this._entry(entry) : null;
+    const locked = _entry != null && !this.customValues(_entry.entry.facet);
+    this.focusInput(this._input(entry)!, clearSelections, locked ? 0 : start, locked ? 0 : end, updateDropdown);
 
     // locking the entry if not editable
     if (locked) {
@@ -164,13 +165,17 @@ export default class AssistedSearchStore {
   }
 
   /** convenience to get an Entry by its value or array index */
-  private _entry(entry: Entry | number): Entry {
+  private _entry(entry: Entry | number): Entry | undefined {
     return typeof entry === 'number' ? this.entries[entry < 0 ? this.entries.length - entry : entry] : entry;
   }
 
   /** Returns either the input of the entry, or the main input if null or undefinde */
-  private _input(entry: Nullable<Entry | number>): Input {
-    return entry != undefined && entry !== -1 ? this._entry(entry).input : this.input;
+  private _input(entry: Nullable<Entry | number>): Input | undefined {
+    if (entry != undefined && entry !== -1) {
+      const ent = this._entry(entry);
+      return ent ? ent.input : undefined;
+    }
+    return this.input;
   }
 
   /**
@@ -594,7 +599,8 @@ export default class AssistedSearchStore {
    * @returns {boolean}
    */
   public isSelectedEntry(entry: Entry | number): boolean {
-    return this._entry(entry).selected === true;
+    let ent = this._entry(entry);
+    return ent ? ent.selected === true : false;
   }
 
   /**
@@ -804,8 +810,8 @@ export default class AssistedSearchStore {
 
   @action
   public deleteEntries(entries: Array<Entry | number>) {
-    entries = entries.map(e => this._entry(e));
-    this.entries = this.entries.filter(e => !entries.includes(e));
+    const ents = new Set(entries.map(e => this._entry(e)));
+    this.entries = this.entries.filter(e => e && !ents.has(e));
   }
 
   // TODO: name discrepancy between getSelectedEntries and getEntries (different return types)
@@ -883,16 +889,18 @@ export default class AssistedSearchStore {
    */
   @action
   public setEntryValue(entry: Entry | number, value: string | Value): void {
-    entry = this._entry(entry);
+    const ent = this._entry(entry);
+    if (!ent) return;
+
     this.deselectEntries();
     if (typeof value === 'string') {
-      entry.input.value = value;
-      entry.entry.value = toValue(value);
+      ent.input.value = value;
+      ent.entry.value = toValue(value);
     } else {
-      entry.entry.value = value;
-      entry.input = newInput(value);
+      ent.entry.value = value;
+      ent.input = newInput(value);
     }
-    if (this.isActiveEntry(entry)) {
+    if (this.isActiveEntry(ent)) {
       this.updateDropdown();
     }
   }

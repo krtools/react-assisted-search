@@ -2,16 +2,7 @@ import {ReactNode, SyntheticEvent} from 'react';
 
 import AssistedSearchStore from './stores/AssistedSearchStore';
 import {AssistedSearchType} from './stores/AssistedSearchType';
-import {ConfigCallback} from './types';
 import UserEventDispatcher from './stores/KeyboardEventDispatcher';
-
-/**
- * Defines a callback that enables configurations to asynchronously define configurations for
- * specific scenarios in the state for given actions.
- */
-export interface ConfigCallback<V, T> {
-  (value: V, store: AssistedSearchStore): T | Promise<T>;
-}
 
 /**
  * Properties that could affect the outcome of a submit. Most attributes could be derived from the store itself, so

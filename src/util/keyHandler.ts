@@ -44,7 +44,7 @@ export default function keyHandler(getMap: GetKeyHandlerMap, after?: Function) {
     let map = getMap();
 
     let test = map.test;
-    if (test && !test.apply(this, arguments)) {
+    if (test && !test.apply(this, arguments as any)) {
       return;
     }
     let keys = [];
