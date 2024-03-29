@@ -5,3 +5,4 @@ yarn-error.log
 storybook-static/
 dist/
 es/
+*.tgz

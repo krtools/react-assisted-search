@@ -62,7 +62,7 @@ export class MountedDropdown extends React.Component<MountedDropdownProps> {
     if (mount) {
       baseDropdown = ReactDOM.createPortal(
         // has tabIndex because now it is outside the container
-        <div ref={this._setRel} tabIndex={-1} style={{pointerEvents:'none'}}>
+        <div ref={this._setRel} tabIndex={-1} style={{pointerEvents: 'none'}} className="assisted-search-mount">
           {baseDropdown}
         </div>,
         mount
